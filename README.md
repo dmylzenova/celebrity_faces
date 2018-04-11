@@ -3,7 +3,7 @@
 `Celebrity faces` is a project which supports a site where you can load your photo and get back photo of
 a celebrity who looks the most like you.
 
-## How does it works:
+## How does it work:
 Project/face_batch.py contains class CelebrityBatch which has methods for data preproccesing, Index creation and search for k approximate nearest neghbours. At the moment it utilizes spotify's [Annoy](https://github.com/spotify/annoy).
 
 CelebrityBatch class is inherited from [dataset's](https://github.com/analysiscenter/dataset) ImagesBatch 
