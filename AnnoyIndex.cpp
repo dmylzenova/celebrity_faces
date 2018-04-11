@@ -42,7 +42,6 @@ public:
         c = 7654321;
     }
 
-
     uint32_t kiss() {
         // Linear congruence generator
         x = 69069 * x + 12345;
@@ -81,11 +80,9 @@ inline long long dot(const long long *x, const long long *y, int f) {
     return s;
 }
 
-
 inline double get_norm(long long *v, int f) {
     return sqrt(dot(v, v, f));
 }
-
 
 inline void normalize(long long *v, int f) {
     double norm = get_norm(v, f);
@@ -95,16 +92,14 @@ inline void normalize(long long *v, int f) {
     }
 }
 
-
 // DISTANCE
+
 
 struct Node {
     long long n_descendants;
     long long a; // need an extra constant term to determine the offset of the plane
-    union {
-        long long children[2];
-        long long norm;
-    };
+    long long children[2];
+    long long norm;
     long long v[1];
 };
 
@@ -122,7 +117,12 @@ static inline void init_node(Node* n, int f) {
 
 
 inline void two_means(const std::vector<Node *> &nodes, int f, Random &random, bool cosine, Node *p, Node *q) {
-
+    /*
+      This algorithm is a huge heuristic. Empirically it works really well, but I
+      can't motivate it well. The basic idea is to keep two centroids and assign
+      points to either one of them. We weight each centroid by the number of points
+      assigned to it, so to balance it.
+    */
     static int iteration_steps = 200;
     size_t count = nodes.size();
 
@@ -206,28 +206,10 @@ static inline bool side(const Node* n, const long long * y, int f, Random& rando
 }
 
 
-class AnnoyIndexInterface {
-public:
-    virtual ~AnnoyIndexInterface() {};
-    virtual void add_item(long long item, const double* w) = 0;
-    virtual void build(int q) = 0;
-    virtual void unbuild() = 0;
-    virtual bool save(const char* filename) = 0;
-    virtual void unload() = 0;
-    virtual bool load(const char* filename) = 0;
-    virtual double get_distance(long long i, long long j) = 0;
-    virtual void get_nns_by_item(long long item, std::size_t n, std::size_t search_k, std::vector<double>* result,
-                                 std::vector<double>* distances) = 0;
-    virtual void get_nns_by_vector(const double* w, std::size_t n, std::size_t search_k, std::vector<double >* result,
-                                   std::vector<double >* distances) = 0;
-    virtual long get_n_items() = 0;
-    virtual void verbose(bool v) = 0;
-    virtual void get_item(long item, double* v) = 0;
-    virtual void set_seed(int q) = 0;
-};
 
 
-class AnnoyIndex : public AnnoyIndexInterface {
+
+class AnnoyIndex {
 public:
     Node node;
 
@@ -241,9 +223,41 @@ protected:
     long long _nodes_size;
     std::vector<long long> _roots;
     long long _K;
-    bool _loaded;
     bool _verbose;
     int _fd;
+
+public:
+    
+    AnnoyIndex(int f) : _f(f), _random() {
+        _s = offsetof(Node, v) + f * sizeof(double); // Size of each node
+        _verbose = false;
+        _K = (_s - offsetof(Node, children)) / sizeof(long long); // Max number of descendants to fit into node
+        reinitialize(); // Reset everything
+    }
+
+    ~AnnoyIndex() {
+        unload();
+    }
+
+
+    void reinitialize() {
+        _fd = 0;
+        _nodes = NULL;
+        _n_items = 0;
+        _n_nodes = 0;
+        _nodes_size = 0;
+        _roots.clear();
+    }
+
+    void unload() {
+        if (_fd) {
+            off_t size = _n_nodes * _s;
+        } else if (_nodes) {
+            free(_nodes);
+        }
+        reinitialize();
+        if (_verbose) std::cout << "Unloaded";
+    }
 
 protected:
 
@@ -313,7 +327,6 @@ protected:
 
             for (size_t i = 0; i < indices.size(); i++) {
                 long long j = indices[i];
-                // Just randomize...
                 children_indices[_random.flip()].push_back(j);
             }
         }
@@ -333,7 +346,8 @@ protected:
         return item;
     }
 
-    void _get_all_nns(const long long* v, size_t n, size_t search_k, std::vector<double>* result, std::vector<double>* distances) {
+    void _get_all_nns(const long long* v, size_t n, size_t search_k, std::vector<double>* result,
+                      std::vector<double>* distances) {
         Node* v_node = (Node *)malloc(_s); // TODO: avoid
         memcpy(v_node->v, v, sizeof(double)*_f);
         init_node(v_node, _f);
@@ -390,4 +404,5 @@ protected:
         }
         free(v_node);
     }
+
 };
