@@ -71,4 +71,6 @@ Now we use spotify's [Annoy](https://github.com/spotify/annoy). But we’re impl
 
  For wrapping our C++ code and use it in python like this: ```from AnnoyIndex import AnnoyIndex``` we use `SWIG`. We added SWIG interface file `AnnoyIndex.i` and now it's possible to call all class methods.
  
- Our plans: now our ```AnnoyIndex``` doesn't work, also we use only `Euclidean distance`, so we can also use `Сosine distance` and  `Hamming` and compare them.
+ Our plans: now our ```AnnoyIndex``` doesn't work, also we use only `Euclidean distance`, so we can also use `Сosine distance` and compare them.
+
+ Also we will compare our Annoy with implemented Annoy, HNSW and FAISS - compare working time of algorithms and accuracy. For accuracy we want to generate brute force correct answers (ordered topK nearest neighbours) for a subset and then compare it with our predictions with some rank metrics, say NDCG.
