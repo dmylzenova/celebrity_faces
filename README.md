@@ -60,8 +60,7 @@ preprocess_ppl = (Pipeline()
 Then when we get new images we do the preproccessing and call a function to search for the neighbours using existing Index:
 
 ```python
-my_workflow = ((preprocess_ppl)
-				.find_nearest_neighbours(src='my_index.ann', k_neighbours=6)
+my_workflow = (preprocess_ppl.find_nearest_neighbours(src='my_index.ann', k_neighbours=6)
 				<< Dataset(index=FilesIndex(path=image_path)), batch_class=CelebrityBatch))
 ```
 
