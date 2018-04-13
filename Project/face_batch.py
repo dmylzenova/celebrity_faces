@@ -13,15 +13,23 @@ class CelebrityBatch(ImagesBatch):
     @action
     def build_index(self, dst='my_index', n_trees=10):
         """
+        Builds and saves AnnoyIndex
+
+        Parameters
+        ----------
+        dst : str
+            a path to store built index
+        n_trees : int
+            number of trees used in AnnoyIndex
         """
         n_dim = self.get(self.indices[0], 'embedding').shape[0]
-        n_items = len(self.indices)
-        print('n_dim: ', n_dim)
         index = AnnoyIndex(n_dim)
-        for i in range(n_items):
-            index.add_item(i, self.get(self.indices[i], 'embedding'))
+        for ix in self.indices:
+            index.add_item(int(ix), self.get(ix, 'embedding'))
         index.build(n_trees)
         index.save(dst + '.ann')
+        print('saved Index to path', dst)
+        
         return self
 
     @action
@@ -66,11 +74,10 @@ class CelebrityBatch(ImagesBatch):
             print('detect_face has found more than one face')
             raise ValueError
         try:
-            bbox = faces[0]
-            return (bbox, )
+            return faces[0]
         except Exception as e:
-            print('failed faces=' , faces)
-            
+            print('Unfortunately I couldn\'t detect face on your photo' , faces)
+
     @action
     @inbatch_parallel(init='indices', post='_assemble', target='for', components='images')
     def crop_from_bbox(self, ix, src='images', dst='images', to_rgb=False, component_coord='coordinates'):
@@ -95,20 +102,26 @@ class CelebrityBatch(ImagesBatch):
         dst_data = image[y:y+height, x:x+width]
         if to_rgb:
             dst_data = dst_data[:, :, ::-1]
-        return (dst_data, )
-
-    @action
-    @inbatch_parallel(init='images', target='for', post='_assemble', components='images')
-    def resize(self, image, *args, fmt='cv'):
-        if fmt == 'cv':
-            return (cv.resize(image, *args), )
-        else:
-            super().resize(image, *args)
+        return dst_data
 
     @action
     @inbatch_parallel(init='images', target='for', post='_assemble', components='images')
     def to_rgb(self, image):
-        return (image[:, :, ::-1], )
+        return image[:, :, ::-1]
+    
+    @action
+    @inbatch_parallel(init='images', target='for', post='_assemble', components='images')
+    def resize(self, image, *args, fmt='cv'):
+        if fmt == 'cv':
+            return cv.resize(image, *args)
+        else:
+            super().resize(image, *args)
+            
+    # @action
+    # @inbatch_parallel(init='indices', target='for', post='_assemble2')
+    # def reassemble_component(self, ix, component='embedding'):
+    #     return (self.get(ix, 'embedding'), )
+
 
 def load_func(data, fmt, components=None, *args, **kwargs):
     """Writes the data for components to a dictionary of the form:
@@ -131,12 +144,12 @@ def load_func(data, fmt, components=None, *args, **kwargs):
     _ = fmt, args, kwargs
     _comp_dict = dict()
     for comp in components:
-        if comp == 'int_index':
-            _comp_dict[comp] = data[comp].values.astype(int)
-        else:
-            data['tmp'] = data[data.columns[-2]].apply(lambda x: str(x).replace('[', '') \
+        if comp == 'embedding':
+            data['tmp'] = data[data.columns[-1]].apply(lambda x: str(x).replace('[', '') \
                                                                                               .replace(']', '') \
                                                                                               .replace('', '')
                                                                                               .split(' '))
             _comp_dict[comp] = data['tmp'].apply(lambda x: np.array(list(map(float, [item for item in x if item != '']))))
+        else:
+            _comp_dict[comp] = data[comp].values.astype(str)
     return _comp_dict
