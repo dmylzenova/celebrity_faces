@@ -24,16 +24,19 @@ class CelebrityBatch(ImagesBatch):
         """
         n_dim = self.get(self.indices[0], 'embedding').shape[0]
         index = AnnoyIndex(n_dim)
-        for ix in self.indices:
-            index.add_item(int(ix), self.get(ix, 'embedding'))
+        n_items = len(self.indices)
+
+        for ix in range(n_items):
+            index.add_item(ix, self.get(self.indices[ix], 'embedding'))
         index.build(n_trees)
         index.save(dst + '.ann')
+        self.int_indices = list(range(n_items))
         print('saved Index to path', dst)
-        
         return self
 
+
     @action
-    @inbatch_parallel(init='indices', post='_assemble', target='threads', components='neighbours')
+    @inbatch_parallel(init='indices', post='_assemble', target='for', components='neighbours')
     def find_nearest_neighbours(self, ix, src='my_index.ann', k_neighbours=6):
         """
         Finds k approximate nearest neighbours using
@@ -42,14 +45,6 @@ class CelebrityBatch(ImagesBatch):
         saved_index = AnnoyIndex(embd.shape[0])
         saved_index.load(src)
         return saved_index.get_nns_by_vector(embd, k_neighbours)
-
-    @action
-    @inbatch_parallel(init='indices', post='_assemble', components='images')
-    def load_cv(self, ix, src, fmt='cv', **kwargs):
-        if fmt == 'cv':
-            return cv.imread(src + str(ix) + '.jpg')
-        else:
-            raise ValueError('fmt must be cv')
 
     @action
     @inbatch_parallel(init='images', post='_assemble', components='coordinates')
@@ -110,6 +105,11 @@ class CelebrityBatch(ImagesBatch):
         return image[:, :, ::-1]
     
     @action
+    @inbatch_parallel(init='indices', post='_assemble', components='images')
+    def to_cv(self, ix, src='images'):
+        return np.array(self.get(ix, src))[:, :, ::-1]
+
+    @action
     @inbatch_parallel(init='images', target='for', post='_assemble', components='images')
     def resize(self, image, *args, fmt='cv'):
         if fmt == 'cv':
@@ -117,11 +117,6 @@ class CelebrityBatch(ImagesBatch):
         else:
             super().resize(image, *args)
             
-    # @action
-    # @inbatch_parallel(init='indices', target='for', post='_assemble2')
-    # def reassemble_component(self, ix, component='embedding'):
-    #     return (self.get(ix, 'embedding'), )
-
 
 def load_func(data, fmt, components=None, *args, **kwargs):
     """Writes the data for components to a dictionary of the form:
