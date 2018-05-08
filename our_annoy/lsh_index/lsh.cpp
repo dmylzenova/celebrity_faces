@@ -17,10 +17,6 @@ LSH::LSH(int num_hash_tables, int num_splits, int dimension_size) {
     _hash_tables.resize(num_hash_tables);
 }
 
-bool LSH::sortbysecond(const std::pair<std::vector<double>, int> &a, const std::pair<std::vector<double>,int> &b) {
-    return (a.second > b.second);
-}
-
 
 double LSH:: dot(const std::vector<double> &x, const std::vector<double> &y) {
     double sum = 0;
@@ -39,7 +35,7 @@ std::vector<double> LSH::normalize(std::vector<double>& v) {
     return v;
 }
 
-std::vector<double> LSH::multiply(std::vector<std::vector<double>> &matrix, std::vector<double> &v) {
+std::vector<double> LSH::multiply(std::vector<std::vector<double> > &matrix, std::vector<double> &v) {
     std::vector<double> result;
     result.reserve(v.size());
     for (int row = 0; row < matrix.size(); ++row) {
@@ -109,22 +105,21 @@ void LSH::add_to_table(std::vector<double> point) {
 }
 
 
-std::vector<std::vector<double>> LSH::find_k_neighboors(int k, std::vector<double> point) {
-    std::vector<std::vector<double>> answer(k);
+std::vector<std::vector<double> > LSH::find_k_neighboors(int k, std::vector<double> point) {
+    std::vector<std::vector<double> > answer(k);
     for(int i=0; i < k; ++i) {
         answer[i].resize(_dimension_size);
     }
-    std::vector<std::pair<std::vector<double>, double>> candidates;
+    std::vector<std::pair<std::vector<double>, double> > candidates;
     candidates.resize(_num_hash_tables);
     for (int i = 0; i <_num_hash_tables; ++i) {
         std::string hash_value = get_hash(point, i);
         std::vector<double> result_point = _hash_tables[i][hash_value];
         candidates[i] = std::make_pair(result_point, calculate_distance(result_point, point));
     }
-    std::sort(candidates.begin(), candidates.end(), sortbysecond);
+    std::sort(candidates.begin(), candidates.end(), sortbysecond());
     for (int i = 0; i < k; ++i) {
         answer[i] = candidates[i].first;
     }
     return answer;
 }
-
