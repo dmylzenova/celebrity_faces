@@ -1,0 +1,23 @@
+1. Annoy
+	0. разобрать статью
+	- бинарное дерево
+	- лес
+	- очередь
+	- ???
+
+2. Frotend/Backend
+	- docker
+	- frontend
+	- backend
+
+3. End-to-end pipeline
+	- preprocess new image:
+		- alignment
+		- detect face
+	- get model's prediction
+	- get annoy's result3 (вызвать готовый)
+
+4. Отчет
+	- Описание архитектуры, интерфейса
+	- Сравнение поиска соседей (как?)
+	
