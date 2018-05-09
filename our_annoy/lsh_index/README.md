@@ -1,6 +1,6 @@
 # celebrity_faces
 
-To compile cython extensions put:
+Build cython extensions:
 
 ```bash
 python3 setup.py build_ext --inplace
