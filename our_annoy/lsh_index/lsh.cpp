@@ -1,5 +1,5 @@
 #include "lsh.h"
-
+#include <iostream>
 
 LSH::LSH() = default;
 
@@ -20,7 +20,7 @@ LSH::LSH(int num_hash_tables, int num_splits, int dimension_size) {
 
 double LSH:: dot(const std::vector<double> &x, const std::vector<double> &y) {
     double sum = 0;
-    for (int i = 0; i < x.size(); ++i) {
+    for (std::size_t i = 0; i < x.size(); ++i) {
         sum += x[i] * y[i];
     }
     return sum;
@@ -29,7 +29,7 @@ double LSH:: dot(const std::vector<double> &x, const std::vector<double> &y) {
 
 std::vector<double> LSH::normalize(std::vector<double>& v) {
     double norm = sqrt(dot(v, v));
-    for (int i = 0; i < v.size(); ++i) {
+    for (std::size_t i = 0; i < v.size(); ++i) {
         v[i] /= norm;
     }
     return v;
@@ -38,9 +38,9 @@ std::vector<double> LSH::normalize(std::vector<double>& v) {
 std::vector<double> LSH::multiply(std::vector<std::vector<double> > &matrix, std::vector<double> &v) {
     std::vector<double> result;
     result.reserve(v.size());
-    for (int row = 0; row < matrix.size(); ++row) {
+    for (std::size_t row = 0; row < matrix.size(); ++row) {
         double sum = 0;
-        for (int el = 0; el < matrix[0].size(); ++el) {
+        for (std::size_t el = 0; el < matrix[0].size(); ++el) {
             sum += matrix[row][el] * v[el];
         }
         result.push_back(sum);
@@ -64,8 +64,8 @@ std::vector<std::vector<double> > LSH::create_splits_for_one_table(std::vector<s
     }
     for (int cur_split = 0; cur_split < _num_splits; ++cur_split) {
         srand(time(NULL)); // random seed
-        int first_rand_ind = rand() % _dimension_size;
-        int sec_rand_ind = rand() % _dimension_size;
+        std::size_t first_rand_ind = rand() % points.size();
+        std::size_t sec_rand_ind = rand() % points.size();
         for (int i = 0; i < _dimension_size; ++i) {
             plane[cur_split][i] = points[sec_rand_ind][i] - points[first_rand_ind][i];
         }
@@ -98,24 +98,24 @@ std::string LSH::get_hash(std::vector<double> point, int hash_table_index) {
 }
 
 
-void LSH::add_to_table(std::vector<double> point) {
+void LSH::add_to_table(embedding_type point) {
     for (int i = 0; i < _num_hash_tables; ++i) {
-        this->_hash_tables[i][get_hash(point, i)] = point;
+        std::string hash_val = get_hash(point._emb, i);
+        this->_hash_tables[i][hash_val].push_back(point);
     }
 }
 
 
-std::vector<std::vector<double> > LSH::find_k_neighboors(int k, std::vector<double> point) {
-    std::vector<std::vector<double> > answer(k);
-    for(int i=0; i < k; ++i) {
-        answer[i].resize(_dimension_size);
-    }
-    std::vector<std::pair<std::vector<double>, double> > candidates;
-    candidates.resize(_num_hash_tables);
+std::vector<int> LSH::find_k_neighboors(int k, int index, std::vector<double> embedding) {
+	std::vector<int> answer(k);
+    std::vector<std::pair<int, double> > candidates;
     for (int i = 0; i <_num_hash_tables; ++i) {
-        std::string hash_value = get_hash(point, i);
-        std::vector<double> result_point = _hash_tables[i][hash_value];
-        candidates[i] = std::make_pair(result_point, calculate_distance(result_point, point));
+        std::string hash_value = get_hash(embedding, i);
+        std::vector<embedding_type> result_points = _hash_tables[i][hash_value];
+        for (auto result_point = result_points.begin(); result_point!= result_points.end(); ++result_point) {
+            candidates.emplace_back(std::make_pair(result_point->_image_index,
+                                                calculate_distance(result_point->_emb, embedding)));
+        }
     }
     std::sort(candidates.begin(), candidates.end(), sortbysecond());
     for (int i = 0; i < k; ++i) {
@@ -123,3 +123,9 @@ std::vector<std::vector<double> > LSH::find_k_neighboors(int k, std::vector<doub
     }
     return answer;
 }
+
+
+
+
+
+
