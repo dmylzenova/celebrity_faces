@@ -8,5 +8,5 @@ app = Flask(__name__)
 photos = UploadSet('photos', IMAGES)
 
 app.config['SECRET_KEY'] = 'dfsdfvwn56vesvnw4fcyvhn5746v83w5'
-app.config['UPLOADED_PHOTOS_DEST'] = os.path.dirname(__file__) + 'static/uploaded_img'
+app.config['UPLOADED_PHOTOS_DEST'] = os.path.dirname(__file__) + '/static/uploaded_img'
 configure_uploads(app, photos)
