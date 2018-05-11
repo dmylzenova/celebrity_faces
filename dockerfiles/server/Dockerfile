@@ -8,7 +8,6 @@ RUN apt-get install -y python3-pip python3-dev build-essential git cmake
 RUN pip3 install --upgrade pip
 
 RUN git clone https://github.com/dmylzenova/celebrity_faces.git
-RUN cd celebrity_faces && git checkout ira_docker && cd ..
 
 RUN pip3 install -r celebrity_faces/requirements.txt
 
