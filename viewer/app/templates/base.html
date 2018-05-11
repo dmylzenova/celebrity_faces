@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?q=1480549734" type="text/css">
+<head>
+    <meta charset="UTF-8">
+    {% if title %}
+    <title>{{title}} - Celebrity faces</title>
+    {% else %}
+    <title>Celebrity faces</title>
+    {% endif %}
+</head>
+<body>
+    <div>Celebrity faces: <a href="{{ url_for('index') }}">Home</a></div>
+    {% if debug %}
+        <strong> ATTENTION! DEBUG MODE ON!</strong><br>
+    {% endif %}
+    <hr>
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+    {% for category, message in messages %}
+        <div class="flash {{category}}">{{message}}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</body>
+</html>
