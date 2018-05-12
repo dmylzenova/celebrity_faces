@@ -107,25 +107,22 @@ void LSH::add_to_table(embedding_type point) {
 
 
 std::vector<int> LSH::find_k_neighboors(int k, int index, std::vector<double> embedding) {
-	std::vector<int> answer(k);
+    std::vector<int> answer;
     std::vector<std::pair<int, double> > candidates;
-    for (int i = 0; i <_num_hash_tables; ++i) {
+    for (int i = 0; i < _num_hash_tables; ++i) {
         std::string hash_value = get_hash(embedding, i);
         std::vector<embedding_type> result_points = _hash_tables[i][hash_value];
-        for (auto result_point = result_points.begin(); result_point!= result_points.end(); ++result_point) {
+        for (auto result_point = result_points.begin(); result_point != result_points.end(); ++result_point) {
             candidates.emplace_back(std::make_pair(result_point->_image_index,
-                                                calculate_distance(result_point->_emb, embedding)));
+                                                   calculate_distance(result_point->_emb, embedding)));
         }
     }
     std::sort(candidates.begin(), candidates.end(), sortbysecond());
-    for (int i = 0; i < k; ++i) {
-        answer[i] = candidates[i].first;
+    answer.push_back(candidates[0].first);
+    for (int i = 1; i < k; ++i) {
+        if (answer[i - 1] != candidates[i].first) {
+            answer.push_back(candidates[i].first);
+        }
     }
     return answer;
 }
-
-
-
-
-
-
