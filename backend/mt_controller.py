@@ -11,7 +11,7 @@ from imageio import imsave
 from face_batch import CelebrityBatch, load_func
 from dataset import FilesIndex, Dataset, Pipeline, V, B
 
-sys.path.append('./model')
+# sys.path.append('/model/')
 from model import MyModel
 
 class MtController:
@@ -26,9 +26,9 @@ class MtController:
         K_NEIGHBOURS = 15
 	
         self.src_images = 'cropped_photos/'
-        self.meters_path = os.path.join(os.getcwd(), "default_meters")
-        self.uploaded_files_path = os.path.join(os.getcwd(), "uploaded_meters")
-        self.meters_filenames = sorted(os.listdir(self.meters_path))
+        # self.meters_path = os.path.join(os.getcwd(), "default_meters")
+        # self.uploaded_files_path = os.path.join(os.getcwd(), "uploaded_meters")
+        # self.meters_filenames = sorted(os.listdir(self.meters_path))
 
         self.find_neighbours_ppl = (Pipeline()
                                          .load(fmt='image', components='images')
