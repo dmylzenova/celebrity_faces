@@ -6,6 +6,8 @@ from libcpp cimport bool
 
 
 ctypedef cpp_vector[double] cpp_vector_double
+ctypedef cpp_vector[int] cpp_vector_int
+
 ctypedef cpp_vector[cpp_vector_double] cpp_vec_vec_double
 
 
@@ -20,7 +22,7 @@ ctypedef embedding_type c_embedding_type
 		LSH(int, int, int)
 		void create_splits(cpp_vec_vec_double)
 		void add_to_table(c_embedding_type)
-		cpp_vec_vec_double find_k_neighboors(int, int, cpp_vector_double)
+		cpp_vector_int find_k_neighboors(int, int, cpp_vector_double)
 
 
 cdef class PyLSH:
