@@ -59,7 +59,7 @@ def main():
         "wsgi.multiprocess": True,
     }
 
-    for i in range(args.process_count):
+    for i in range(args.process_count - 1):
         Process(target=serve_forever,
                 kwargs={"listener": listener, "application": app.app.wsgi_app, "environ": environ}).start()
     serve_forever(listener, app.app.wsgi_app, environ)
