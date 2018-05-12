@@ -2,7 +2,7 @@ import sys
 
 import tensorflow as tf
 # sys.path.append("..")
-from dataset.dataset.models.tf import TFModel
+from dataset.models.tf import TFModel
 
 
 class MyModel(TFModel):

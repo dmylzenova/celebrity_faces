@@ -1,12 +1,5 @@
 import os
-import sys
-import re
-import numpy as np
-import base64
 import pandas as pd
-
-from imageio import imread
-from imageio import imsave
 
 from face_batch import CelebrityBatch, load_func
 from dataset import FilesIndex, Dataset, Pipeline, V, B
