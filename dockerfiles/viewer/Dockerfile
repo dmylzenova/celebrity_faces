@@ -11,7 +11,7 @@ RUN git clone https://github.com/dmylzenova/celebrity_faces.git
 
 RUN pip3 install -r celebrity_faces/requirements.txt
 
-RUN cd celebrity_faces && git fetch && git checkout ira_docker
+RUN cd celebrity_faces && git fetch && git checkout ira_docker && cd ..
 
 CMD celebrity_faces/viewer/run.py \
     --port=2018 \
