@@ -32,7 +32,7 @@ def parse_args():
     parser.add_argument("--haarcascade-xml-path", type=str,
                         default=os.path.dirname(__file__) + '/app/static/haarcascade_frontalface_default.xml')
     parser.add_argument("--log-file-path", default=None)
-    parser.add_argument("--process-count", type=int, default=16)
+    parser.add_argument("--process-count", type=int, default=1)
 
     return parser.parse_args()
 

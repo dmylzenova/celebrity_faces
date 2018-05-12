@@ -9,14 +9,13 @@ import model
 
 class MtController:
     def __init__(self, k_neighbours=15, img_shape=(160, 160),
-                 model_path=os.path.join(os.getcwd(), 'model/'),
+                 model_path=os.path.dirname(__file__) + '/app/static/model',
                  model_name='model-20170512-110547',
                  checkpoint='model-20170512-110547.ckpt-250000',
                  cropped_photos_dir='cropped_photos',
-                 index_path='data/150k_50t_index.ann',
-                 int_mapping_file='data/int_indices_mapping.csv',
-                 haarcascade_xml_path='haarcascade_frontalface_default.xml'):
-
+                 index_path=os.path.dirname(__file__) + '/app/static/index/150k_50t_index.ann',
+                 int_mapping_file=os.path.dirname(__file__) + '/app/static/index/int_indices_mapping.csv',
+                 haarcascade_xml_path=os.path.dirname(__file__) + '/app/static/haarcascade_frontalface_default.xml'):
         self.cropped_photos_dir = cropped_photos_dir
 
         self.find_neighbours_ppl = (Pipeline()
