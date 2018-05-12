@@ -26,8 +26,8 @@ cdef class PyLSH:
         self.thisptr = LSH(num_hash_tables, num_splits, dimension_size)
     def create_splits(self, points):
         return self.thisptr.create_splits(points)
-    def add_to_table(self, int, cpp_vector_double):
-        return self.thisptr.add_to_table(int, cpp_vector_double)
+    def add_to_table(self, index, embedding):
+        return self.thisptr.add_to_table(index, embedding)
     def find_k_neighboors(self, k, point):
         return self.thisptr.find_k_neighboors(k, point)
     def dummy_k_neighboors(self, k, index, indexes, embeddings, given_point):
