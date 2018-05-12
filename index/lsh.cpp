@@ -97,9 +97,16 @@ std::string LSH::get_hash(std::vector<double> point, int hash_table_index) {
 }
 
 
-std::vector<int> LSH::dummy_k_neighboors(int k, int index, std::vector<embedding_type> points,
+
+std::vector<int> LSH::dummy_k_neighboors(int k, int index, std::vector<int> indexes,
+                                    std::vector<std::vector<double> > embeddings,
                                     std::vector<double> given_point) {
     std::vector<int> answer;
+    std::vector<embedding_type> points;
+    for (std::size_t i = 0; i < indexes.size(); ++i) {
+        points.push_back({indexes[i], embeddings[i]});
+
+    }
     std::vector<std::pair<int, double> > candidates;
     for (auto el = points.begin(); el != points.end(); ++el) {
         double curr_distance = calculate_distance(el->_emb, given_point);
@@ -113,10 +120,13 @@ std::vector<int> LSH::dummy_k_neighboors(int k, int index, std::vector<embedding
         }
     }
     return answer;
+
 }
 
-
-void LSH::add_to_table(embedding_type point) {
+void LSH::add_to_table(int index, std::vector<double> embedding) {
+    embedding_type point;
+    point._image_index = index;
+    point._emb = embedding;
     for (int i = 0; i < _num_hash_tables; ++i) {
         std::string hash_val = get_hash(point._emb, i);
         this->_hash_tables[i][hash_val].push_back(point);
@@ -124,7 +134,7 @@ void LSH::add_to_table(embedding_type point) {
 }
 
 
-std::vector<int> LSH::find_k_neighboors(int k, int index, std::vector<double> embedding) {
+std::vector<int> LSH::find_k_neighboors(int k, std::vector<double> embedding) {
     std::vector<int> answer;
     std::vector<std::pair<int, double> > candidates;
     for (int i = 0; i < _num_hash_tables; ++i) {

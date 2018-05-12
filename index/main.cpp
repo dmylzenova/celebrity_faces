@@ -19,19 +19,25 @@ int main() {
     points[2] = c;
     points[3] = d;
     lsh.create_splits(points);
-    lsh.add_to_table({1, a});
-    lsh.add_to_table({5, b});
-    lsh.add_to_table({2, c});
-    lsh.add_to_table({3, d});
+    lsh.add_to_table(1, a);
+    lsh.add_to_table(5, b);
+    lsh.add_to_table(2, c);
+    lsh.add_to_table(3, d);
 
-    std::vector<embedding_type> points_emb;
-    points_emb.push_back({1, a});
-    points_emb.push_back({5, b});
-    points_emb.push_back({2, c});
-    points_emb.push_back({3, d});
+    std::vector<int> indexes;
+    std::vector<std::vector<double> > embeddings;
 
-    std::vector<int> answer = lsh.find_k_neighboors(2, 1, e);
-    std::vector<int> answer1 = lsh.dummy_k_neighboors(2, 1, points_emb, e);
+    indexes.push_back(1);
+    indexes.push_back(5);
+    indexes.push_back(2);
+    indexes.push_back(3);
+    embeddings.push_back(a);
+    embeddings.push_back(b);
+    embeddings.push_back(c);
+    embeddings.push_back(d);
+
+    std::vector<int> answer = lsh.find_k_neighboors(2, e);
+    std::vector<int> answer1 = lsh.dummy_k_neighboors(2, 1, indexes, embeddings, e);
 
 
     std::cout << "Hello, World!" << std::endl;

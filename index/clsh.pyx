@@ -10,21 +10,13 @@ ctypedef cpp_vector[cpp_vector_double] cpp_vec_vec_double
 
 
 cdef extern from "lsh.h":
-    cdef struct embedding_type:
-        int _image_index
-        cpp_vector_double _emb
-
-ctypedef embedding_type c_embedding_type
-ctypedef cpp_vector[c_embedding_type] cpp_vector_emb_type
-
-cdef extern from "lsh.h":
     cdef cppclass LSH:
         LSH() except +
         LSH(int, int, int)
         void create_splits(cpp_vec_vec_double)
         void add_to_table(c_embedding_type)
-        cpp_vector_int find_k_neighboors(int, int, cpp_vector_double)
-        cpp_vector_int dummy_k_neighboors(int, int, cpp_vector_emb_type,
+        cpp_vector_int find_k_neighboors(int, cpp_vector_double)
+        cpp_vector_int dummy_k_neighboors(int, int, cpp_vector_int, cpp_vec_vec_double,
                                                      cpp_vector_double)
 
 
@@ -36,7 +28,7 @@ cdef class PyLSH:
         return self.thisptr.create_splits(points)
     def add_to_table(self, point):
         return self.thisptr.add_to_table(point)
-    def find_k_neighboors(self, k, index, point):
-        return self.thisptr.find_k_neighboors(k, index, point)
-    def dummy_k_neighboors(self, k, index, points, given_point):
-        return self.thisptr.dummy_k_neighboors(k, index, points, given_point)
+    def find_k_neighboors(self, k, point):
+        return self.thisptr.find_k_neighboors(k, point)
+    def dummy_k_neighboors(self, k, index, indexes, embeddings, given_point):
+        return self.thisptr.dummy_k_neighboors(k, index, indexes, embeddings, given_point)
