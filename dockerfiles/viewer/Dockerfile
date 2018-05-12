@@ -11,7 +11,7 @@ RUN git clone https://github.com/dmylzenova/celebrity_faces.git
 
 RUN pip3 install -r celebrity_faces/requirements.txt
 
-CMD celebrity_faces/viewer/run.py --port=2018 --host='0.0.0.0'
+CMD celebrity_faces/viewer/run.py --port=2018
 
 # docker build -t flask-server:latest .
 # docker run -d -p 2018:2018 flask-server
