@@ -1,0 +1,21 @@
+version: '2'
+
+services:
+  web:
+    build:
+        context: ./
+        dockerfile: Dockerfile_web.dev
+    volumes:
+      - ./src:/../../backend/
+    ports:
+      - "2018:2018"
+
+  index:
+    build:
+        context: ./
+        dockerfile: Dockerfile_index.dev
+    ports:
+      - 3000:3000
+    volumes:
+      - ./src:/../../backend/
+
