@@ -1,5 +1,4 @@
 #include "lsh.h"
-#include <iostream>
 
 LSH::LSH() = default;
 
@@ -95,6 +94,25 @@ std::string LSH::get_hash(std::vector<double> point, int hash_table_index) {
         }
     }
     return hash_value;
+}
+
+
+std::vector<int> LSH::dummy_k_neighboors(int k, int index, std::vector<embedding_type> points,
+                                    std::vector<double> given_point) {
+    std::vector<int> answer;
+    std::vector<std::pair<int, double> > candidates;
+    for (auto el = points.begin(); el != points.end(); ++el) {
+        double curr_distance = calculate_distance(el->_emb, given_point);
+        candidates.emplace_back(std::make_pair(el->_image_index, curr_distance));
+    }
+    std::sort(candidates.begin(), candidates.end(), sortbysecond());
+    answer.push_back(candidates[0].first);
+    for (int i = 1; i < k; ++i) {
+        if (answer[i - 1] != candidates[i].first) {
+            answer.push_back(candidates[i].first);
+        }
+    }
+    return answer;
 }
 
 

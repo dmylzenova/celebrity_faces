@@ -39,4 +39,7 @@ public:
     std::string get_hash(std::vector<double> point, int hash_table_index);
     void add_to_table(embedding_type point);
     std::vector<int> find_k_neighboors(int k, int index, std::vector<double> embedding);
+    std::vector<int> dummy_k_neighboors(int k, int index, std::vector<embedding_type> points,
+                                        std::vector<double> given_point);
+
 };
