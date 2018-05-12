@@ -7,13 +7,18 @@ sudo apt-get install -y docker-engine
 sudo usermod -aG docker $(whoami)
 sudo docker run hello-world
 
+# TODO: скачивать сюда данные через wget и распаковывать - сейчас пока руками это делаем:
+mkdir -p data
+mkdir -p data/model
+mkdir -p data/index
+mkdir -p data/uploaded
+
 mkdir -p dockerfiles
 mkdir -p dockerfiles/viewer
 cd dockerfiles/viewer
 wget 'https://raw.githubusercontent.com/dmylzenova/celebrity_faces/master/dockerfiles/viewer/Dockerfile' -O Dockerfile
 sudo docker build --no-cache -t flask-server:latest .
-sudo docker run -d -p 2018:2018 flask-server
+sudo docker run -v ./data:/root/data -d -p 2018:2018 flask-server
 
-# TODO: тут запустить ещё контейнер с поиском ближайшего соседа
 # docker ps
 # docker stop <conteiner-id>

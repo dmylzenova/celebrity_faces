@@ -1,7 +1,4 @@
-import sys
-
 import tensorflow as tf
-# sys.path.append("..")
 from dataset.models.tf import TFModel
 
 
