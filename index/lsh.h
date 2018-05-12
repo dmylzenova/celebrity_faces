@@ -37,7 +37,7 @@ public:
     std::vector<std::vector<double> > create_splits_for_one_table(std::vector<std::vector<double> > points);
     void create_splits(std::vector<std::vector<double> > points);
     std::string get_hash(std::vector<double> point, int hash_table_index);
-    void add_to_table(embedding_type point);
+    void add_to_table(int index, std::vector<double> embedding);
     std::vector<int> find_k_neighboors(int k, std::vector<double> embedding);
     std::vector<int> dummy_k_neighboors(int k, int index, std::vector<int> indexes,
         std::vector<std::vector<double> > embeddings,
