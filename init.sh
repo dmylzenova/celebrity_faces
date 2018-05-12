@@ -18,7 +18,8 @@ mkdir -p dockerfiles/viewer
 cd dockerfiles/viewer
 wget 'https://raw.githubusercontent.com/dmylzenova/celebrity_faces/master/dockerfiles/viewer/Dockerfile' -O Dockerfile
 sudo docker build --no-cache -t flask-server:latest .
-sudo docker run -v ./data:/root/data -d -p 2018:2018 flask-server
+cd ~
+sudo docker run -v /data:/root/data -d -p 2018:2018 flask-server
 
 # docker ps
 # docker stop <conteiner-id>
