@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import flask
-from app import app, photos
+from app import app, photos, mt
 
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -32,4 +32,7 @@ def index():
 
 @app.route('/result/<filename>')
 def result(filename):
-    return flask.render_template('result.html', filename=filename)
+    init_photo_path = photos.path(filename)
+    celebrity_photo_path = mt.get_inference(init_photo_path, images_count=1)[0]
+    return flask.render_template('result.html', init_photo_path=init_photo_path,
+                                 celebrity_photo_path=celebrity_photo_path)

@@ -2,9 +2,9 @@
 {% block content %}
     <h1>Results</h1>
     Твоё фото: <br>
-    <img src="/static/uploaded_img/{{ filename }}" width="300"> <br>
+    <img src="{{ init_photo_path }}" width="300"> <br>
     Знаменитость, на которую ты похож: <br>
-    TODO <br>
+    <img src="{{ celebrity_photo_path }}" width="300"> <br>
 
 
 {% endblock %}
