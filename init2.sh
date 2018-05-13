@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -xue -o pipefail -o posix
 sudo apt-get update -y && sudo apt-get upgrade -y
 sudo apt-get install -y python3-pip python3-dev build-essential cmake libgtk2.0-dev git wget unzip
 if [ ! -d "celebrity_faces" ]; then
