@@ -1,5 +1,113 @@
 #include "lsh.h"
 
+
+void write_planes_to_file(std::vector<std::vector<std::vector<double> > > planes) {
+    std::ofstream file;
+    file.open("planes.txt");
+    for (int line = 0; line < planes.size(); ++line) {
+        for (int row = 0; row < planes[0].size(); ++row) {
+            for (int col = 0; col < planes[0][0].size(); ++col) {
+                file << planes[line][row][col] << ' ';
+            }
+            file << '\n';
+        }
+        file << '\n';
+    }
+    file.close();
+}
+
+
+std::vector<std::vector<std::vector<double> > > read_planes_from_file(int num_hash_tables, int num_splits) {
+    std::vector<std::vector<std::vector<double> > > result(num_hash_tables);
+    for (int i =0; i < num_hash_tables; ++i) {
+        result[i].resize(num_splits);
+    }
+    std::string line;
+    std::ifstream file ("planes.txt");
+    int split_ind = 0;
+    int hash_table_num = 0;
+    if (file.is_open()) {
+        while (getline(file, line)) {
+            if (line.empty()) {
+                hash_table_num +=1;
+                split_ind = 0;
+                if (hash_table_num == num_hash_tables)
+                    break;
+            }
+            else {
+                std::istringstream s2(line);
+                double tmp;
+                while (s2 >> tmp) {
+                    result[hash_table_num][split_ind].push_back(tmp);
+                }
+                split_ind += 1;
+            }
+        }
+        file.close();
+    }
+    return result;
+}
+
+
+std::unordered_map<std::string, std::vector<embedding_type> > read_map_from_one_file(std::string name) {
+    std::ifstream file (name);
+    std::unordered_map<std::string, std::vector<embedding_type> > result;
+    std::string line;
+    std::string key;
+    bool prev_key = true;
+    if (file.is_open()) {
+        while (getline(file, line)) {
+            if (line.empty()) {
+                prev_key = true;
+                getline(file, line);
+                getline(file, line);
+            }
+            if (prev_key) {
+                key = line;
+                getline(file, line);
+            }
+            if (line.empty()) {
+                break;
+            }
+            int index;
+            index = line[0] - '0';
+            std::istringstream(line.at(0)) >> index;
+            line = line.erase(0, 1);
+            double tmp;
+            std::istringstream s2(line);
+            std::vector<double> emb;
+            while (s2 >> tmp) {
+                emb.push_back(tmp);
+            }
+            embedding_type point;
+            point._image_index = index;
+            point._emb = emb;
+            result[key].push_back(point);
+            prev_key = false;
+
+        }
+    }
+    file.close();
+    return result;
+}
+
+
+std::vector<std::unordered_map<std::string, std::vector<embedding_type> > > read_map_from_files(int num_hash_tables) {
+    std::vector<std::unordered_map<std::string, std::vector<embedding_type> > > answer;
+    for (int i = 0; i < num_hash_tables; ++i) {
+        std::string name = std::to_string(i) + ".txt";
+        auto res = read_map_from_one_file(name);
+        for (auto el = res.begin(); el!=res.end(); el++) {
+            auto item = *el;
+            int i = 0;
+        }
+
+        answer.push_back(read_map_from_one_file(name));
+    }
+    return answer;
+};
+
+
 LSH::LSH() = default;
 
 LSH::LSH(int num_hash_tables, int num_splits, int dimension_size) {
@@ -17,6 +125,39 @@ LSH::LSH(int num_hash_tables, int num_splits, int dimension_size) {
 }
 
 
+LSH::LSH(int num_hash_tables, int num_splits, int dimension_size, bool is_build) {
+    _num_hash_tables = num_hash_tables;
+    _num_splits = num_splits;
+    _dimension_size = dimension_size;
+    _planes = read_planes_from_file(num_hash_tables, num_splits);
+    _hash_tables = read_map_from_files(num_hash_tables);
+}
+
+void LSH::write_map_to_file() {
+    int num_hash_tables = this->_hash_tables.size();
+    for (int i = 0; i < num_hash_tables; ++i) {
+        std::string name = std::to_string(i) + ".txt";
+        std::ofstream file;
+        file.open(name);
+        auto it = this->_hash_tables[i].begin();
+        while(it != this->_hash_tables[i].end()) {
+            file << it->first;
+            file << "\n";
+            for (auto item = it->second.begin(); item != it->second.end(); ++item) {
+                file << item->_image_index << " ";
+                for (auto el = item->_emb.begin(); el != item->_emb.end(); ++el) {
+                    file << *el << " ";
+                }
+                file << "\n";
+            }
+            file << "\n\n";
+            it++;
+        }
+        file.close();
+    }
+}
+
+
 double LSH:: dot(const std::vector<double> &x, const std::vector<double> &y) {
     double sum = 0;
     for (std::size_t i = 0; i < x.size(); ++i) {
@@ -28,6 +169,9 @@ double LSH:: dot(const std::vector<double> &x, const std::vector<double> &y) {
 
 std::vector<double> LSH::normalize(std::vector<double>& v) {
     double norm = sqrt(dot(v, v));
+    if (norm == 0) {
+        return v;
+    }
     for (std::size_t i = 0; i < v.size(); ++i) {
         v[i] /= norm;
     }
@@ -78,6 +222,7 @@ void LSH::create_splits(std::vector<std::vector<double> > points) {
     for (int num_table = 0; num_table < _num_hash_tables; ++num_table) {
         this->_planes[num_table] = this->create_splits_for_one_table(points);
     }
+    write_planes_to_file(_planes);
 }
 
 
@@ -95,7 +240,6 @@ std::string LSH::get_hash(std::vector<double> point, int hash_table_index) {
     }
     return hash_value;
 }
-
 
 
 std::vector<int> LSH::dummy_k_neighboors(int k, int index, std::vector<int> indexes,
@@ -120,8 +264,8 @@ std::vector<int> LSH::dummy_k_neighboors(int k, int index, std::vector<int> inde
         }
     }
     return answer;
-
 }
+
 
 void LSH::add_to_table(int index, std::vector<double> embedding) {
     embedding_type point;
@@ -146,6 +290,9 @@ std::vector<int> LSH::find_k_neighboors(int k, std::vector<double> embedding) {
         }
     }
     std::sort(candidates.begin(), candidates.end(), sortbysecond());
+    if (candidates.empty()) {
+        return answer;
+    }
     answer.push_back(candidates[0].first);
     for (int i = 1; i < k; ++i) {
         if (answer[i - 1] != candidates[i].first) {
