@@ -19,16 +19,16 @@ int main() {
     points[1] = b;
     points[2] = c;
     points[3] = d;
-    lsh.create_splits(points);
+    lsh.create_splits(points, "data/");
     lsh.add_to_table(1, a);
     lsh.add_to_table(5, b);
     lsh.add_to_table(2, c);
     lsh.add_to_table(3, d);
-    lsh.write_map_to_file();
+    lsh.write_map_to_file("data/");
 
 
     // find neighborrs
-    LSH lsh1(2, 4, 13, true);
+    LSH lsh1(2, 4, 13, "data/");
     std::vector<int> answer = lsh1.find_k_neighboors(2, e);
 
     // dummy k_neighboors
@@ -51,4 +51,5 @@ int main() {
     std::cout << "Hello, World!" << std::endl;
     return 0;
 }
+
 

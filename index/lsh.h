@@ -26,9 +26,8 @@ public:
     LSH();
     std::vector<std::vector<std::vector<double> > >_planes;
     std::vector<std::unordered_map<std::string, std::vector<embedding_type> > > _hash_tables;
-    LSH(int num_hash_tables, int num_splits, int dimension_size);
-    LSH(int num_hash_tables, int num_splits, int dimension_size, bool is_build);
-    void write_map_to_file();
+    LSH(int num_hash_tables, int num_splits, int dimension_size, std::string path_to_dir);
+    void write_map_to_file(std::string path_to_dir);
     struct sortbysecond {
         bool operator()(const std::pair<int, double> &a, const std::pair<int, double> &b) const {
             return a.second > b.second;
@@ -39,7 +38,7 @@ public:
     std::vector<double> multiply(std::vector<std::vector<double> > &matrix, std::vector<double> &v);
     double calculate_distance(std::vector<double>& v_first, std::vector<double>& v_sec);
     std::vector<std::vector<double> > create_splits_for_one_table(std::vector<std::vector<double> > points);
-    void create_splits(std::vector<std::vector<double> > points);
+    void create_splits(std::vector<std::vector<double> > points, std::string path_to_dir);
     std::string get_hash(std::vector<double> point, int hash_table_index);
     void add_to_table(int index, std::vector<double> embedding);
     std::vector<int> find_k_neighboors(int k, std::vector<double> embedding);
