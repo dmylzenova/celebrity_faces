@@ -71,7 +71,6 @@ std::unordered_map<std::string, std::vector<embedding_type> > read_map_from_one_
             }
             int index;
             index = line[0] - '0';
-            std::istringstream(line.at(0)) >> index;
             line = line.erase(0, 1);
             double tmp;
             std::istringstream s2(line);
@@ -96,12 +95,6 @@ std::vector<std::unordered_map<std::string, std::vector<embedding_type> > > read
     std::vector<std::unordered_map<std::string, std::vector<embedding_type> > > answer;
     for (int i = 0; i < num_hash_tables; ++i) {
         std::string name = std::to_string(i) + ".txt";
-        auto res = read_map_from_one_file(name);
-        for (auto el = res.begin(); el!=res.end(); el++) {
-            auto item = *el;
-            int i = 0;
-        }
-
         answer.push_back(read_map_from_one_file(name));
     }
     return answer;
