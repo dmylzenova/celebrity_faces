@@ -22,6 +22,7 @@ private:
     int _num_hash_tables;
     int _num_splits;
     int _dimension_size;
+    std::mt19937 _generator;
 public:
     LSH();
     std::vector<std::vector<std::vector<double> > >_planes;
