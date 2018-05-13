@@ -13,7 +13,7 @@ ctypedef cpp_vector[cpp_vector_double] cpp_vec_vec_double
 cdef extern from "lsh.h":
     cdef cppclass LSH:
         LSH() except +
-        LSH((int, int, int, string)
+        LSH(int, int, int, string)
         void write_map_to_file(string)
         void create_splits(cpp_vec_vec_double, string)
         void add_to_table(int, cpp_vector_double)
