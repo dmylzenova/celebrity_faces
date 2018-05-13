@@ -4,7 +4,7 @@ MAINTAINER Irina Goltsman <irina-goltsman@yandex.ru>
 ENV HOME /root
 
 RUN apt-get update -y
-RUN apt-get install -y python3-pip python3-dev build-essential cmake libgtk2.0-dev git
+RUN apt-get install -y python3-pip python3-dev build-essential cmake libgtk2.0-dev git wget
 RUN pip3 install --upgrade pip
 
 RUN git clone https://github.com/dmylzenova/celebrity_faces.git
