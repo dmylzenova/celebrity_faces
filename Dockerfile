@@ -15,7 +15,7 @@ RUN cd celebrity_faces/viewer/app/static && wget 'https://downloader.disk.yandex
     -O index.zip && rm -rf index && unzip index.zip
 
 RUN cd celebrity_faces/viewer/app/static && wget 'https://downloader.disk.yandex.ru/disk/cef427fd5805b06fe7e4fed0880e20f85accec9d4ddf7fedac0f787520a0bb67/5af7f024/ddZ6cPttF3My8iD24FAVMNMVwbHXYPOtYUfz0SZYfxH4mFRft67jMJo_GH5EjeEpmnhqvnutlhOthPxqre2UjA%3D%3D?uid=0&filename=cropped_photos.zip&disposition=attachment&hash=feWHaLxtk1%2B8dmL0kDELoAtGd9yXP8yu5rSTpmx4ucM%3D&limit=0&content_type=application%2Fx-zip-compressed&fsize=743778718&hid=43983205d7b1bae83ea31cf278897abd&media_type=compressed&tknv=v2' \
-    -O cropped_photos.zip && unzip cropped_photos.zip
+    -O cropped_photos.zip && rm -rf cropped_photos && unzip cropped_photos.zip
 
 RUN pip3 install -r celebrity_faces/requirements.txt
 
