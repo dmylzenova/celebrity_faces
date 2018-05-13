@@ -31,10 +31,9 @@ wget 'https://downloader.disk.yandex.ru/disk/1e1a11d600fcc976238f6ea9f9a4330216f
     -O cropped_photos.zip
 unzip cropped_photos.zip
 
-cd $HOME/celebrity_faces/dockerfiles/viewer
+cd $HOME/celebrity_faces
 sudo docker build --no-cache -t flask-server:latest .
-# TODO: не видно изнутри папку celebrity_faces - грусть печаль
-#sudo docker run -v celebrity_faces:/root/celebrity_faces -d -p 2018:2018 flask-server
+sudo docker run -v celebrity_faces:/root/celebrity_faces -d -p 2018:2018 flask-server
 
 # docker ps
 # docker stop <conteiner-id>

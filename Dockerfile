@@ -7,11 +7,12 @@ RUN apt-get update -y
 RUN apt-get install -y python3-pip python3-dev build-essential cmake libgtk2.0-dev git
 RUN pip3 install --upgrade pip
 
-RUN git clone https://github.com/dmylzenova/celebrity_faces.git
+ADD celebrity_faces $HOME/celebrity_faces
+#RUN git clone https://github.com/dmylzenova/celebrity_faces.git
 
-RUN pip3 install -r celebrity_faces/requirements.txt
+RUN pip3 install -r $HOME/celebrity_faces/requirements.txt
 
-CMD celebrity_faces/viewer/run.py
+CMD $HOME/celebrity_faces/viewer/run.py
 
 # docker build -t flask-server:latest .
 # docker run -d -p 2018:2018 flask-server
