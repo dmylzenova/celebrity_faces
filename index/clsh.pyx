@@ -13,6 +13,7 @@ cdef extern from "lsh.h":
     cdef cppclass LSH:
         LSH() except +
         LSH(int, int, int)
+        void write_map_to_file()
         void create_splits(cpp_vec_vec_double)
         void add_to_table(int, cpp_vector_double)
         cpp_vector_int find_k_neighboors(int, cpp_vector_double)
@@ -24,6 +25,8 @@ cdef class PyLSH:
     cdef LSH thisptr
     def __cinit__(self, num_hash_tables, num_splits, dimension_size):
         self.thisptr = LSH(num_hash_tables, num_splits, dimension_size)
+    def write_map_to_file(self):
+        return self.thisptr.write_map_to_file()
     def create_splits(self, points):
         return self.thisptr.create_splits(points)
     def add_to_table(self, index, embedding):
