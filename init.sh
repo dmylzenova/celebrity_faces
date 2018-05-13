@@ -11,7 +11,7 @@ mkdir -p dockerfiles
 cd dockerfiles
 wget 'https://raw.githubusercontent.com/dmylzenova/celebrity_faces/master/Dockerfile' -O Dockerfile
 
-sudo docker build --no-cache -t flask-server:latest .
+sudo docker build -t flask-server:latest .
 sudo docker run -i -t -p 2018:2018 flask-server
 
 # docker ps
