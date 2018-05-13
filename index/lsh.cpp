@@ -1,6 +1,7 @@
 #include "lsh.h"
 
 
+
 void write_planes_to_file(std::vector<std::vector<std::vector<double> > > planes, std::string path_to_dir) {
     std::ofstream file;
     file.open(path_to_dir + "planes.txt");
@@ -209,10 +210,25 @@ std::vector<std::vector<double> > LSH::create_splits_for_one_table(std::vector<s
     return plane;
 }
 
+std::vector<std::vector<double> > LSH::create_splits_other(std::vector<std::vector<double> > points) {
+    std::normal_distribution<float> distribution(0.0, 1.0);
+    std::vector<std::vector<double> > planes;
+    for (int i = 0; i < _num_splits; ++i) {
+        std::vector<double > current_vector;
+        for (int j = 0; j < _dimension_size; ++j) {
+            double current_push = distribution(_generator);
+            current_vector.push_back(current_push);
+        }
+        planes.push_back(current_vector);
+    }
+    return planes;
+}
+
 
 void LSH::create_splits(std::vector<std::vector<double> > points, std::string path_to_dir) {
     for (int num_table = 0; num_table < _num_hash_tables; ++num_table) {
-        this->_planes[num_table] = this->create_splits_for_one_table(points);
+        //this->_planes[num_table] = this->create_splits_for_one_table(points);
+        this->_planes[num_table] = this->create_splits_other(points);
     }
     write_planes_to_file(_planes, path_to_dir);
 }
@@ -298,4 +314,3 @@ std::vector<int> LSH::find_k_neighboors(int k, std::vector<double> embedding) {
     }
     return answer;
 }
-

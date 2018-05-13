@@ -39,6 +39,7 @@ public:
     std::vector<double> multiply(std::vector<std::vector<double> > &matrix, std::vector<double> &v);
     double calculate_distance(std::vector<double>& v_first, std::vector<double>& v_sec);
     std::vector<std::vector<double> > create_splits_for_one_table(std::vector<std::vector<double> > points);
+    std::vector<std::vector<double> > create_splits_other(std::vector<std::vector<double> > points);
     void create_splits(std::vector<std::vector<double> > points, std::string path_to_dir);
     std::string get_hash(std::vector<double> point, int hash_table_index);
     void add_to_table(int index, std::vector<double> embedding);
