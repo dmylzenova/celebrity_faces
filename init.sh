@@ -8,7 +8,11 @@ sudo usermod -aG docker $(whoami)
 sudo docker run hello-world
 
 sudo apt-get install -y git
-sudo git clone https://github.com/dmylzenova/celebrity_faces.git
+if [ ! -d "celebrity_faces" ]; then
+    git clone https://github.com/dmylzenova/celebrity_faces.git
+else
+    git pull
+fi
 
 # TODO: Upload data
 #cd celebrity_faces/viewer/app/static

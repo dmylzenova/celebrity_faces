@@ -9,3 +9,4 @@ git+https://github.com/analysiscenter/dataset.git
 annoy==1.12.0
 numpy==1.14.3
 pandas==0.22.0
+git+https://github.com/CWSpear/local-persist.git
