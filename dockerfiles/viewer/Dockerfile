@@ -7,6 +7,8 @@ RUN apt-get update -y
 RUN apt-get install -y python3-pip python3-dev build-essential cmake libgtk2.0-dev
 RUN pip3 install --upgrade pip
 
+VOLUME celebrity_faces
+
 RUN pip3 install -r celebrity_faces/requirements.txt
 
 CMD celebrity_faces/viewer/run.py

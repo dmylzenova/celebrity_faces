@@ -14,6 +14,9 @@ else
     git pull
 fi
 
+curl -fsSL https://raw.githubusercontent.com/CWSpear/local-persist/master/scripts/install.sh | sudo bash
+docker volume create -d local-persist -o mountpoint=$HOME/celebrity_faces --name=celebrity_faces
+
 # TODO: Upload data
 #cd celebrity_faces/viewer/app/static
 #cd wget ..
@@ -21,7 +24,7 @@ fi
 cd $HOME/celebrity_faces/dockerfiles/viewer
 sudo docker build --no-cache -t flask-server:latest .
 cd $HOME/celebrity_faces
-sudo docker run -v $HOME/celebrity_faces:/root/celebrity_faces -d -p 2018:2018 flask-server
+sudo docker run -v celebrity_faces:/root/celebrity_faces -d -p 2018:2018 flask-server
 
 # docker ps
 # docker stop <conteiner-id>
