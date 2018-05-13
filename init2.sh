@@ -31,4 +31,4 @@ if [ ! -f cropped_photos.zip ]; then
     unzip cropped_photos.zip
 fi
 
-cd ../.. && chmod +x ./run.sh && ./run.sh
+cd $HOME/celebrity_faces/viewer && chmod +x ./run.sh && ./run.sh
