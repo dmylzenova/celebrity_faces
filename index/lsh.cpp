@@ -285,10 +285,15 @@ std::vector<int> LSH::find_k_neighboors(int k, std::vector<double> embedding) {
     if (candidates.empty()) {
         return answer;
     }
+    int number = 0;
     answer.push_back(candidates[0].first);
-    for (int i = 1; i < k; ++i) {
+    for (int i = 1; i < candidates.size(); ++i) {
         if (answer[i - 1] != candidates[i].first) {
             answer.push_back(candidates[i].first);
+            number++;
+            if (number == k) {
+                break;
+            }
         }
     }
     return answer;
