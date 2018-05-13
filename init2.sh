@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 sudo apt-get update -y && sudo apt-get upgrade -y
-sudo apt-get install -y git unzip
+sudo apt-get install -y git unzip wget
 if [ ! -d "celebrity_faces" ]; then
     git clone https://github.com/dmylzenova/celebrity_faces.git
 else
