@@ -67,10 +67,8 @@ my_workflow = (preprocess_ppl.find_nearest_neighbours(src='my_index.ann', k_neig
 And the neighbours indices will be saves to the batch's component `neighbours`.
 
 ## About our knn method:
-Now we use spotify's [Annoy](https://github.com/spotify/annoy). But we’re implementing our Annoy version. At the current stage there is class `AnnoyIndex.cpp` with two main methods: ```_make_tree``` - function for building tree and ```_get_all_nns``` - for searching all the trees until have k candidates, but now this methods don’t work.
+Firstly, we used spotify's [Annoy](https://github.com/spotify/annoy). Then we implemented Locality-sensitive hashing (LSH) algorithm. There are 4 main methods: init, create_splits (creates plane splitting for each hash-table), add_to_table (add embedding and photo index in hash-table) and find_k_neighboors. Also, we implemented saving the constructed index and ability to download it from file.
 
- For wrapping our C++ code and use it in python like this: ```from AnnoyIndex import AnnoyIndex``` we use `SWIG`. We added SWIG interface file `AnnoyIndex.i` and now it's possible to call all class methods.
- 
- Our plans: now our ```AnnoyIndex``` doesn't work, also we use only `Euclidean distance`, so we can also use `Сosine distance` and compare them.
+For wrapping our C++ code and use it in python like this: ```import pylsh``` we used `Cython`.
 
- Also we will compare our Annoy with implemented Annoy, HNSW and FAISS - compare working time of algorithms and accuracy. For accuracy we want to generate brute force correct answers (ordered topK nearest neighbours) for a subset and then compare it with our predictions with some rank metrics, say NDCG.
+Also, we implemented brute force solution for finding k neighboors to compare with LSH.
