@@ -9,7 +9,7 @@ sudo docker run hello-world
 
 mkdir -p dockerfiles
 cd dockerfiles
-wget 'https://github.com/dmylzenova/celebrity_faces/blob/master/Dockerfile' -O Dockerfile
+wget 'https://raw.githubusercontent.com/dmylzenova/celebrity_faces/master/Dockerfile' -O Dockerfile
 
 sudo docker build --no-cache -t flask-server:latest .
 sudo docker run -i -t -p 2018:2018 flask-server
