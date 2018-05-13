@@ -23,6 +23,7 @@ docker volume create -d local-persist -o mountpoint=$HOME/celebrity_faces --name
 
 cd $HOME/celebrity_faces/dockerfiles/viewer
 sudo docker build --no-cache -t flask-server:latest .
+# TODO: не видно изнутри папку celebrity_faces - грусть печаль
 sudo docker run -v celebrity_faces:/root/celebrity_faces -d -p 2018:2018 flask-server
 
 # docker ps
