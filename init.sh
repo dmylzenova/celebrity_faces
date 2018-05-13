@@ -39,7 +39,8 @@ if [ ! -f cropped_photos.zip ]; then
     unzip cropped_photos.zip
 fi
 
-cd $HOME/celebrity_faces
+cd $HOME
+cp celebrity_faces/Dockerfile Dockerfile
 sudo docker build --no-cache -t flask-server:latest .
 sudo docker run -v celebrity_faces:/root/celebrity_faces -d -p 2018:2018 flask-server
 
