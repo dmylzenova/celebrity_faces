@@ -2,9 +2,13 @@
 {% block content %}
     <h1>Results</h1>
     Твоё фото: <br>
-    <img src="{{ init_photo_path }}" width="300"> <br>
-    Знаменитость, на которую ты похож: <br>
-    <img src="{{ celebrity_photo_path }}" width="300"> <br>
-
+    <img src="/static/uploaded_img/{{ init_photo }}" width="200"> <br>
+    Знаменитости, на которых ты похож: <br>
+    <img src="/static/cropped_photos/{{ celebrity_photos[0] }}" width="200"><br>
+    {% for photo in celebrity_photos[1:] %}
+        <img src="/static/cropped_photos/{{ photo }}" width="100">
+    {% endfor %}
+    <br>
+    <br>
 
 {% endblock %}

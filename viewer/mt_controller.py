@@ -54,5 +54,5 @@ class MtController:
         print('got next batch')
         knn = [self.indices_mapping.loc[neighbour_index, 'file_name']
                for neighbour_index in batch.neighbours[0][:images_count]]
-        knn_files = [os.path.join(self.cropped_photos_dir, str(current) + '.jpg') for current in knn]
+        knn_files = [str(current) + '.jpg' for current in knn]
         return knn_files

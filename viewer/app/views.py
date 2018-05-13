@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import flask
 from app import app, photos, mt
 
@@ -32,7 +33,7 @@ def index():
 
 @app.route('/result/<filename>')
 def result(filename):
-    init_photo_path = photos.path(filename)
-    celebrity_photo_path = mt.get_inference(init_photo_path, images_count=1)[0]
-    return flask.render_template('result.html', init_photo_path=init_photo_path,
-                                 celebrity_photo_path=celebrity_photo_path)
+    init_photo = filename
+    celebrity_photos = mt.get_inference(os.path.dirname(__file__) + "/static/uploaded_img/" + init_photo,
+                                        images_count=8)
+    return flask.render_template('result.html', init_photo=init_photo, celebrity_photos=celebrity_photos)

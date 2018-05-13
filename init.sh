@@ -7,19 +7,17 @@ sudo apt-get install -y docker-engine
 sudo usermod -aG docker $(whoami)
 sudo docker run hello-world
 
-# TODO: скачивать сюда данные через wget и распаковывать - сейчас пока руками это делаем:
-mkdir -p data
-mkdir -p data/model
-mkdir -p data/index
-mkdir -p data/uploaded
+sudo apt-get install -y git
+sudo git clone https://github.com/dmylzenova/celebrity_faces.git
 
-mkdir -p dockerfiles
-mkdir -p dockerfiles/viewer
-cd dockerfiles/viewer
-wget 'https://raw.githubusercontent.com/dmylzenova/celebrity_faces/master/dockerfiles/viewer/Dockerfile' -O Dockerfile
+# TODO: Upload data
+#cd celebrity_faces/viewer/app/static
+#cd wget ..
+
+cd $HOME/celebrity_faces/dockerfiles/viewer
 sudo docker build --no-cache -t flask-server:latest .
-cd /home/ubuntu
-sudo docker run -v /home/ubuntu/data:/root/data -d -p 2018:2018 flask-server
+cd $HOME/celebrity_faces
+sudo docker run -v $HOME/celebrity_faces:/root/celebrity_faces -d -p 2018:2018 flask-server
 
 # docker ps
 # docker stop <conteiner-id>
