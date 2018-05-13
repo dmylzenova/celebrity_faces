@@ -23,7 +23,6 @@ docker volume create -d local-persist -o mountpoint=$HOME/celebrity_faces --name
 
 cd $HOME/celebrity_faces/dockerfiles/viewer
 sudo docker build --no-cache -t flask-server:latest .
-cd $HOME/celebrity_faces
 sudo docker run -v celebrity_faces:/root/celebrity_faces -d -p 2018:2018 flask-server
 
 # docker ps
