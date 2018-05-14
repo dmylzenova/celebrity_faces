@@ -326,7 +326,3 @@ std::vector<int> LSH::find_k_neighboors(int k, std::vector<double> embedding) {
     return result;
 }
 
-
-int main() {
-    LSH lsh1(1, 2, 128, "3/");
-}
