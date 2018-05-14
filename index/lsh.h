@@ -32,7 +32,7 @@ public:
     void write_map_to_file(std::string path_to_dir);
     struct sortbysecond {
         bool operator()(const std::pair<int, double> &a, const std::pair<int, double> &b) const {
-            return a.second > b.second;
+            return a.second <= b.second;
         }
     };
     double dot(const std::vector<double> &x, const std::vector<double> &y);
