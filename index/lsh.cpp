@@ -288,7 +288,7 @@ void LSH::add_to_table(int index, std::vector<double> embedding) {
 
 
 std::vector<int> LSH::find_k_neighboors(int k, std::vector<double> embedding) {
-    std::vector<int> answer;
+    std::set<int> answer;
     std::vector<std::pair<int, double> > candidates;
     for (int i = 0; i < _num_hash_tables; ++i) {
         std::string hash_value = get_hash(embedding, i);
@@ -300,18 +300,14 @@ std::vector<int> LSH::find_k_neighboors(int k, std::vector<double> embedding) {
     }
     std::sort(candidates.begin(), candidates.end(), sortbysecond());
     if (candidates.empty()) {
-        return answer;
+        return {};
     }
-    int number = 0;
-    answer.push_back(candidates[0].first);
     for (int i = 1; i < candidates.size(); ++i) {
-        if (answer[i - 1] != candidates[i].first) {
-            answer.push_back(candidates[i].first);
-            number++;
-            if (number == k) {
-                break;
-            }
+        answer.insert(candidates[i].first);
+        if (answer.size() == k) {
+            break;
         }
     }
-    return answer;
+    std::vector<int> result(answer.begin(), answer.end());
+    return result;
 }
