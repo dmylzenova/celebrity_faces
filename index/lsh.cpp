@@ -236,9 +236,10 @@ void LSH::create_splits(std::vector<std::vector<double> > points, std::string pa
 
 std::string LSH::get_hash(std::vector<double> point, int hash_table_index) {
     std::string hash_value;
-    hash_value.resize(_dimension_size);
+    hash_value.resize(_num_splits);
     std::vector<double> values = multiply(_planes[hash_table_index], point);
-    for (int indx = 0; indx < _dimension_size; ++indx) {
+    std::cout << values.size();
+    for (int indx = 0; indx < _num_splits; ++indx) {
         if (values[indx] > 0) {
             hash_value[indx] = '1';
 
