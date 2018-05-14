@@ -94,7 +94,7 @@ std::unordered_map<std::string, std::vector<embedding_type> > read_map_from_one_
             point._image_index = index;
             point._emb = emb;
             result[key].push_back(point);
-            new_key = true;
+            new_key = false;
         }
     }
     file.close();
