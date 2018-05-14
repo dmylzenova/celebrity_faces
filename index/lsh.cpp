@@ -173,7 +173,7 @@ std::vector<double> LSH::normalize(std::vector<double>& v) {
 
 std::vector<double> LSH::multiply(std::vector<std::vector<double> > &matrix, std::vector<double> &v) {
     std::vector<double> result;
-    result.reserve(v.size());
+    result.reserve(_num_splits);
     for (std::size_t row = 0; row < matrix.size(); ++row) {
         double sum = 0;
         for (std::size_t el = 0; el < matrix[0].size(); ++el) {
