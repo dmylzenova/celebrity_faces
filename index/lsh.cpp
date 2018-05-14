@@ -1,4 +1,15 @@
 #include "lsh.h"
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <cmath>
+#include <string>
+#include <unordered_map>
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <set>
 
 
 
@@ -55,26 +66,26 @@ std::unordered_map<std::string, std::vector<embedding_type> > read_map_from_one_
     std::unordered_map<std::string, std::vector<embedding_type> > result;
     std::string line;
     std::string key;
-    bool prev_key = true;
+    bool new_key = true;
     if (file.is_open()) {
         while (getline(file, line)) {
             if (line.empty()) {
-                prev_key = true;
+                new_key = true;
                 getline(file, line);
                 getline(file, line);
             }
-            if (prev_key) {
+            if (new_key) {
                 key = line;
                 getline(file, line);
             }
             if (line.empty()) {
                 break;
             }
-            int index;
-            index = line[0] - '0';
-            line = line.erase(0, 1);
-            double tmp;
             std::istringstream s2(line);
+            int index;
+            s2 >> index;
+
+            double tmp;
             std::vector<double> emb;
             while (s2 >> tmp) {
                 emb.push_back(tmp);
@@ -83,8 +94,7 @@ std::unordered_map<std::string, std::vector<embedding_type> > read_map_from_one_
             point._image_index = index;
             point._emb = emb;
             result[key].push_back(point);
-            prev_key = false;
-
+            new_key = true;
         }
     }
     file.close();
@@ -314,4 +324,9 @@ std::vector<int> LSH::find_k_neighboors(int k, std::vector<double> embedding) {
     }
     std::vector<int> result(answer.begin(), answer.end());
     return result;
+}
+
+
+int main() {
+    LSH lsh1(1, 2, 128, "3/");
 }
