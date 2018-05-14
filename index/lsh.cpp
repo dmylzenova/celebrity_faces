@@ -186,10 +186,14 @@ std::vector<double> LSH::multiply(std::vector<std::vector<double> > &matrix, std
 
 
 double LSH::calculate_distance(std::vector<double>& v_first, std::vector<double>& v_sec) {
-    double pp = sqrt(dot(v_first, v_first));
+    /*double pp = sqrt(dot(v_first, v_first));
     double qq = sqrt(dot(v_sec, v_sec));
     double pq = sqrt(dot(v_first, v_sec));
-    return pp + qq - 2 * pq;
+    return pp + qq - 2 * pq;*/
+    double distance = 0;
+    double similarity = dot(v_first, v_sec) / sqrt(dot(v_first, v_first) * dot(v_sec, v_sec));
+    distance = 1 - similarity;
+    return distance;
 }
 
 
