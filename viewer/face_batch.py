@@ -1,52 +1,80 @@
 """Batch class for Celebrity faces project"""
+import sys
+
+import pylsh
+import json
+
 import cv2 as cv
 import numpy as np
 from annoy import AnnoyIndex
-from dataset import ImagesBatch, action, inbatch_parallel
+from dataset import ImagesBatch, action, inbatch_parallel, any_action_failed, DatasetIndex, F
 
 
 class CelebrityBatch(ImagesBatch):
-    components = 'images', 'coordinates', 'embedding', 'neighbours', 'int_indices'
+    components = 'images', 'coordinates', 'embedding', 'neighbours', 'int_indices', 'dummy_neighbours'
 
+       
     @action
-    def build_index(self, dst='my_index', n_trees=10):
+    @inbatch_parallel(init='indices', post='_assemble', target='for',                       components='dummy_neighbours')
+    def load_dummy_neighbours(self, ix, src='dummy_neighbours.scv', k_neighbours=6):
+        all_dummy = json.load(open(src, 'r'))
+        return all_dummy[ix][:k_neighbours]
+    
+    @action
+    def build_index(self, pyindex, use_pylsh=True, pylsh_params=(5, 20, 128), dst_path='./index_data/', n_trees=10):
         """
         Builds and saves AnnoyIndex
 
         Parameters
         ----------
-        dst : str
+        dst_path : str
             a path to store built index
+        pylsh_params : tuple of length 3
+            pylsh_params
         n_trees : int
             number of trees used in AnnoyIndex
         """
-        n_dim = self.get(self.indices[0], 'embedding').shape[0]
-        index = AnnoyIndex(n_dim)
-        n_items = len(self.indices)
+        if use_pylsh:
+            pyindex.create_splits()
+            for ix in self.indices:
+                current_embd = self.get(ix, 'embedding')
+                pyindex.add_to_table(int(ix), current_embd)
+            pyindex.write_planes_to_file((dst_path + 'split.txt').encode(encoding='UTF-8'))
+            pyindex.write_hash_tables_to_files((dst_path + 'index').encode(encoding='UTF-8'))
+            pyindex.write_index_embedding_dict((dst_path + 'index_embedding.txt').encode(encoding='UTF-8'))
+            print('saved Index to path', dst_path)
 
-        for ix in range(n_items):
-            index.add_item(ix, self.get(self.indices[ix], 'embedding'))
-        index.build(n_trees)
-        index.save(dst + '.ann')
-        self.int_indices = list(range(n_items))
-        print('saved Index to path', dst)
+        else:
+            n_dim = self.get(self.indices[0], 'embedding').shape[0]
+            index = AnnoyIndex(n_dim)
+            n_items = len(self.indices)
+            for ix in range(n_items):
+                index.add_item(ix, self.get(self.indices[ix], 'embedding'))
+            index.build(n_trees)
+            index.save(dst + 'annoy.ann')
+            self.int_indices = list(range(n_items))
+            print('saved Index to ', dst)
         return self
-
 
     @action
     @inbatch_parallel(init='indices', post='_assemble', target='for', components='neighbours')
-    def find_nearest_neighbours(self, ix, src='my_index.ann', k_neighbours=6):
+    def find_nearest_neighbours(self, ix, pyindex, use_pylsh=True, pylsh_params=(5, 2000, 128), src='my_index.ann', 
+                                use_preloaded=True, k_neighbours=6):
         """
         Finds k approximate nearest neighbours using
         """
         embd = self.get(ix, 'embedding')
-        saved_index = AnnoyIndex(embd.shape[0])
-        saved_index.load(src)
-        return saved_index.get_nns_by_vector(embd, k_neighbours)
+        if use_pylsh:
+            print('HEEY', pyindex.find_k_neighbors(k_neighbours, embd))
+            return pyindex.find_k_neighbors(k_neighbours, embd)
+        else:
+            saved_index = AnnoyIndex(embd.shape[0])
+            saved_index.load(src)
+            return saved_index.get_nns_by_vector(embd, k_neighbours)
 
     @action
     @inbatch_parallel(init='images', post='_assemble', components='coordinates')
-    def detect_face(self, image, haarcascade_xml_path='haarcascade_frontalface_default.xml'):
+    def detect_face(self, image):
         """
         Finds coordinates of the single face on the image using haarcascade from cv2.
         Parameters
@@ -59,7 +87,7 @@ class CelebrityBatch(ImagesBatch):
         bbox : tuple or list
             face's bounding box in format (x, y, w, h)
         """
-        face_cascade = cv.CascadeClassifier(haarcascade_xml_path)
+        face_cascade = cv.CascadeClassifier('haarcascade_frontalface_default.xml')
         gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
         try:
             faces = face_cascade.detectMultiScale(gray, 1.3, 5)
@@ -68,10 +96,11 @@ class CelebrityBatch(ImagesBatch):
             return [0, 0, image.shape[1], image.shape[0]]
         if len(faces) > 1:
             print('detect_face has found more than one face')
+            raise ValueError
         try:
             return faces[0]
         except Exception as e:
-            print('haarcascade couldn\'t detect face on your photo', faces)
+            print('haarcascade couldn\'t detect face on your photo' , faces)
             return [0, 0, image.shape[1], image.shape[0]]
 
     @action
@@ -123,7 +152,6 @@ class CelebrityBatch(ImagesBatch):
     def to_array(self, image):
         return np.array(image)[:, :, :3]
 
-
 def load_func(data, fmt, components=None, *args, **kwargs):
     """Writes the data for components to a dictionary of the form:
     key : component's name
@@ -154,3 +182,4 @@ def load_func(data, fmt, components=None, *args, **kwargs):
         else:
             _comp_dict[comp] = data[comp].values.astype(str)
     return _comp_dict
+
