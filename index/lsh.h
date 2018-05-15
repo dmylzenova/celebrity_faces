@@ -21,13 +21,16 @@ public:
     LSH(size_t num_hash_tables, size_t num_splits, size_t dimension_size);
 
     void create_splits();
-    void write_planes_to_file(const std::string &path_to_dir);
-    bool read_planes_from_file(const std::string &path_to_dir);
+    bool write_planes_to_file(const std::string &path_to_file);
+    bool read_planes_from_file(const std::string &path_to_file);
 
     void add_to_table(size_t index, const std::vector<double> &embedding);
+    bool write_index_embedding_dict(const std::string &path_to_file);
+    bool read_index_embedding_dict(const std::string &path_to_dir);
 
-    void write_hash_tables_to_files(const std::string &path_to_dir);
-    bool fill_data_from_files(const std::string &path_to_dir);
+    bool write_hash_tables_to_files(const std::string &path_to_dir);
+    bool fill_data_from_files(const std::string &planes_path, const std::string &hash_tables_dir_path,
+                              const std::string &index_embedding_dict_path);
     bool read_hash_tables_from_files(const std::string &path_to_dir);
 
     std::vector<std::vector<double> > create_splits_for_one_table();

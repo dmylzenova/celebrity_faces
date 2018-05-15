@@ -1,5 +1,6 @@
 #include "lsh.h"
 #include <cassert>
+#include <cstring>
 
 LSH::LSH() = default;
 
@@ -27,27 +28,32 @@ void LSH::create_splits() {
     }
 }
 
-void LSH::write_planes_to_file(const std::string &path_to_dir) {
+bool LSH::write_planes_to_file(const std::string &path_to_file) {
     std::ofstream file;
-    file.open(path_to_dir + "planes.txt");
-    for (auto &hash_table_planes : _planes) {
-        for (auto &plane : hash_table_planes) {
-            for (double val: plane) {
-                file << val << ' ';
+    file.open(path_to_file);
+    if (file.is_open()) {
+        for (auto &hash_table_planes : _planes) {
+            for (auto &plane : hash_table_planes) {
+                for (double val: plane) {
+                    file << val << ' ';
+                }
+                file << std::endl;
             }
             file << std::endl;
         }
-        file << std::endl;
+        file.close();
+        return true;
     }
-    file.close();
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
+    return false;
 }
 
-bool LSH::read_planes_from_file(const std::string &path_to_dir) {
+bool LSH::read_planes_from_file(const std::string &path_to_file) {
     std::string line;
-    std::ifstream file(path_to_dir + "planes.txt");
+    std::ifstream file(path_to_file);
     int split_ind = 0;
     size_t hash_table_num = 0;
-    if (file.is_open()) {
+    if (!file.fail()) {
         while (getline(file, line)) {
             if (line.empty()) {
                 hash_table_num += 1;
@@ -67,29 +73,88 @@ bool LSH::read_planes_from_file(const std::string &path_to_dir) {
         file.close();
         return true;
     }
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
     return false;
 }
 
 
-bool LSH::fill_data_from_files(const std::string &path_to_dir) {
-    return this->read_planes_from_file(path_to_dir) && this->read_hash_tables_from_files(path_to_dir);
+void LSH::add_to_table(size_t index, const std::vector<double> &embedding) {
+    for (size_t hash_table_index = 0; hash_table_index < _num_hash_tables; ++hash_table_index) {
+        unsigned long long hash_val = get_hash(embedding, hash_table_index);
+        this->_hash_tables[hash_table_index][hash_val].insert(index);
+    }
+    _img_index_to_embedding.insert({index, embedding});
 }
 
-void LSH::write_hash_tables_to_files(const std::string &path_to_dir) {
+bool LSH::write_index_embedding_dict(const std::string &path_to_file) {
+    std::ofstream file;
+    file.open(path_to_file);
+    if (file.is_open()) {
+        for (auto &dict_record : _img_index_to_embedding) {
+            file << dict_record.first << " ";
+            for (auto &val: dict_record.second) {
+                file << val << " ";
+            }
+            file << std::endl;
+        }
+        file.close();
+        return true;
+    }
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
+    return false;
+}
+
+bool LSH::read_index_embedding_dict(const std::string &path_to_file) {
+    size_t img_index;
+    std::string line;
+    std::ifstream file(path_to_file);
+    if (file.is_open()) {
+        while (getline(file, line)) {
+            std::istringstream linestream(line);
+            linestream >> img_index;
+
+            double embedding_val;
+            std::vector<double> embedding;
+            while (linestream >> embedding_val) {
+                embedding.push_back(embedding_val);
+            }
+            _img_index_to_embedding.insert(std::make_pair(img_index, embedding));
+        }
+        file.close();
+        return true;
+    }
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
+    return false;
+}
+
+bool LSH::fill_data_from_files(const std::string &planes_path, const std::string &hash_tables_dir_path,
+                               const std::string &index_embedding_dict_path) {
+    return this->read_planes_from_file(planes_path)
+           && this->read_hash_tables_from_files(hash_tables_dir_path)
+           && read_index_embedding_dict(index_embedding_dict_path);
+}
+
+bool LSH::write_hash_tables_to_files(const std::string &path_to_dir) {
     size_t num_hash_tables = this->_hash_tables.size();
     for (size_t i = 0; i < num_hash_tables; ++i) {
         std::string name = path_to_dir + std::to_string(i) + ".txt";
         std::ofstream file;
         file.open(name);
-        for (auto &hash_img_ids: this->_hash_tables[i]) {
-            file << hash_img_ids.first << " ";
-            for (size_t img_index: hash_img_ids.second) {
-                file << img_index << " ";
+        if (file.is_open()) {
+            for (auto &hash_img_ids: this->_hash_tables[i]) {
+                file << hash_img_ids.first << " ";
+                for (size_t img_index: hash_img_ids.second) {
+                    file << img_index << " ";
+                }
+                file << std::endl;
             }
-            file << std::endl;
+            file.close();
+        } else {
+            std::cerr << "Error: " << std::strerror(errno) << std::endl;
+            return false;
         }
-        file.close();
     }
+    return true;
 }
 
 bool LSH::read_hash_table_from_file(std::unordered_map<unsigned long long, std::set<size_t> > *result,
@@ -114,6 +179,7 @@ bool LSH::read_hash_table_from_file(std::unordered_map<unsigned long long, std::
         file.close();
         return true;
     }
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
     return false;
 }
 
@@ -121,6 +187,7 @@ bool LSH::read_hash_tables_from_files(const std::string &path_to_dir) {
     for (size_t i = 0; i < _num_hash_tables; ++i) {
         std::string name = path_to_dir + std::to_string(i) + ".txt";
         if (!LSH::read_hash_table_from_file(&_hash_tables[i], name)) {
+            std::cerr << "Error: " << std::strerror(errno) << std::endl;
             return false;
         }
     };
@@ -215,15 +282,6 @@ std::vector<int> LSH::dummy_k_neighbors(size_t k, std::vector<int> indexes,
     }
     std::vector<int> result(answer.begin(), answer.end());
     return result;
-}
-
-
-void LSH::add_to_table(size_t index, const std::vector<double> &embedding) {
-    for (size_t hash_table_index = 0; hash_table_index < _num_hash_tables; ++hash_table_index) {
-        unsigned long long hash_val = get_hash(embedding, hash_table_index);
-        this->_hash_tables[hash_table_index][hash_val].insert(index);
-    }
-    _img_index_to_embedding.insert({index, embedding});
 }
 
 

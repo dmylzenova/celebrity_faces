@@ -1,4 +1,5 @@
 #include "lsh.h"
+#include <cassert>
 
 int main() {
     // build index
@@ -20,18 +21,19 @@ int main() {
     points[2] = c;
     points[3] = d;
     lsh.create_splits();
-    lsh.write_planes_to_file("data/");
+    assert (lsh.write_planes_to_file("./planes.txt"));
 
     lsh.add_to_table(1, a);
     lsh.add_to_table(5, b);
     lsh.add_to_table(2, c);
     lsh.add_to_table(3, d);
-    lsh.write_hash_tables_to_files("data/");
+    assert (lsh.write_hash_tables_to_files("./"));
+    assert (lsh.write_index_embedding_dict("./index_embedding.txt"));
 
 
     // find neighbors
     LSH lsh1(2, 4, 13);
-    lsh1.fill_data_from_files("data/");
+    assert (lsh1.fill_data_from_files("./planes.txt", "./", "./index_embedding.txt"));
     std::vector<int> answer = lsh1.find_k_neighbors(2, e);
 
     // dummy k_neighbors
