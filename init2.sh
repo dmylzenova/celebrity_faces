@@ -35,4 +35,4 @@ fi
 
 cd $HOME/celebrity_faces/viewer
 chmod +x ./run.py
-/run.py
+./run.py
