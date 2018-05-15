@@ -9,7 +9,7 @@ else
 fi
 sudo pip3 install --upgrade pip
 sudo pip3 install -r $HOME/celebrity_faces/requirements.txt
-cd $HOME/celebrity_faces/index && sudo python3 setup.py build_ext --inplace && cp pylsh*.so $HOME/celebrity_faces/viewer
+cd $HOME/celebrity_faces/index && python3 setup.py build_ext --inplace && cp pylsh*.so $HOME/celebrity_faces/viewer
 
 # Upload data
 cd $HOME/celebrity_faces/viewer/app/static
