@@ -21,7 +21,7 @@ if [ ! -f model.zip ]; then
 fi
 
 if [ ! -f index.zip ]; then
-    wget 'https://downloader.disk.yandex.ru/disk/56429913bf621d0fecddaffb07f496253228e91bb4f846d71ccbae7ef240d68c/5af7de83/ddZ6cPttF3My8iD24FAVMLWMAimOr1IH7kjEXqvIlMc_o218Slwcl6_M90Vr188_ME4XXrbkjFcbHAQMNG27zQ%3D%3D?uid=0&filename=data.zip&disposition=attachment&hash=id3IdAvIzwSJCyzBrF3/Omv8HNaptwDTxnwRW29BLZY%3D&limit=0&content_type=application%2Fx-zip-compressed&fsize=254814383&hid=6ce4cf160312f8a880ba38d671985212&media_type=compressed&tknv=v2' \
+    wget 'https://downloader.disk.yandex.ru/disk/36b06bd1a6059cf4129041960745bbac3b1358ee6e627c7dc91f5b778a94b1d7/5afb284f/hcn9DwIWb0_PkfTJnWMiaHGFEdVHxVXvMyxC7I_XlwJqJIawRyXEMfWFDKs3l2CMQ4Z9dkWJSL9HIjcL6bDV9Q%3D%3D?uid=0&filename=data.tar.gz&disposition=attachment&hash=%2B%2B6fwQGYQcslFHy7dzj3e%2B3J/uyYEquUqxV8CKH4W3U%3D&limit=0&content_type=application%2Fgzip&fsize=139173022&hid=cea20f2b9a830f0b67b8044389b769a5&media_type=compressed&tknv=v2' \
         -O index.zip
     rm -rf index
     unzip index.zip
