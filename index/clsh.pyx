@@ -13,9 +13,11 @@ ctypedef cpp_vector[cpp_vector_double] cpp_vec_vec_double
 cdef extern from "lsh.h":
     cdef cppclass LSH:
         LSH() except +
-        LSH(int, int, int, string)
-        void write_map_to_file(string)
-        void create_splits(string)
+        LSH(int, int, int)
+        bool fill_data_from_files(string)
+        void write_hash_tables_to_files(string)
+        void write_planes_to_file(string)
+        void create_splits()
         void add_to_table(int, cpp_vector_double)
         cpp_vector_int find_k_neighbors(size_t, cpp_vector_double)
         cpp_vector_int dummy_k_neighbors(size_t, cpp_vector_int, cpp_vec_vec_double, cpp_vector_double)
@@ -25,12 +27,16 @@ cdef extern from "lsh.h":
 
 cdef class PyLSH:
     cdef LSH thisptr
-    def __cinit__(self, num_hash_tables, num_splits, dimension_size, path_to_dir):
-        self.thisptr = LSH(num_hash_tables, num_splits, dimension_size, path_to_dir)
-    def write_map_to_file(self, path_to_dir):
-        return self.thisptr.write_map_to_file(path_to_dir)
-    def create_splits(self, path_to_dir):
-        return self.thisptr.create_splits(path_to_dir)
+    def __cinit__(self, num_hash_tables, num_splits, dimension_size):
+        self.thisptr = LSH(num_hash_tables, num_splits, dimension_size)
+    def fill_data_from_files(self, path_to_dir):
+        return self.thisptr.fill_data_from_files(path_to_dir)
+    def write_hash_tables_to_files(self, path_to_dir):
+        return self.thisptr.write_hash_tables_to_files(path_to_dir)
+    def write_planes_to_file(self, path_to_dir):
+        return self.thisptr.write_planes_to_file(path_to_dir)
+    def create_splits(self):
+        return self.thisptr.create_splits()
     def add_to_table(self, index, embedding):
         return self.thisptr.add_to_table(index, embedding)
     def find_k_neighbors(self, k, point):

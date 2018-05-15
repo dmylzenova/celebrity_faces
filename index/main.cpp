@@ -19,16 +19,19 @@ int main() {
     points[1] = b;
     points[2] = c;
     points[3] = d;
-    lsh.create_splits("data/");
+    lsh.create_splits();
+    lsh.write_planes_to_file("data/");
+
     lsh.add_to_table(1, a);
     lsh.add_to_table(5, b);
     lsh.add_to_table(2, c);
     lsh.add_to_table(3, d);
-    lsh.write_map_to_file("data/");
+    lsh.write_hash_tables_to_files("data/");
 
 
     // find neighbors
-    LSH lsh1(2, 4, 13, "data/");
+    LSH lsh1(2, 4, 13);
+    lsh1.fill_data_from_files("data/");
     std::vector<int> answer = lsh1.find_k_neighbors(2, e);
 
     // dummy k_neighbors
