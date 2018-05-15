@@ -33,4 +33,6 @@ if [ ! -f cropped_photos.zip ]; then
     unzip cropped_photos.zip
 fi
 
-chmod +x $HOME/celebrity_faces/viewer/run.py && $HOME/celebrity_faces/viewer/run.py
+cd $HOME/celebrity_faces/viewer
+chmod +x ./run.py
+/run.py
