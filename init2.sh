@@ -21,7 +21,7 @@ if [ ! -f model.zip ]; then
 fi
 
 if [ ! -f index.tar.gz ]; then
-    wget 'https://downloader.disk.yandex.ru/disk/1fe230e012562745e33f1a971a09f32eae01a355fa4f7cb7d08aa2e64bae6cc1/5afb7c66/hcn9DwIWb0_PkfTJnWMiaHGFEdVHxVXvMyxC7I_XlwJqJIawRyXEMfWFDKs3l2CMQ4Z9dkWJSL9HIjcL6bDV9Q==?uid=0&filename=data.tar.gz&disposition=attachment&hash=++6fwQGYQcslFHy7dzj3e+3J/uyYEquUqxV8CKH4W3U=&limit=0&content_type=application/gzip&fsize=139173022&hid=cea20f2b9a830f0b67b8044389b769a5&media_type=compressed&tknv=v2' \
+    wget 'https://downloader.disk.yandex.ru/disk/e6609687685d6736a25fe3499acb157118021917514646d219d80fdf53d48ed7/5afb7e21/hcn9DwIWb0_PkfTJnWMiaHGFEdVHxVXvMyxC7I_XlwJqJIawRyXEMfWFDKs3l2CMQ4Z9dkWJSL9HIjcL6bDV9Q==?uid=0&filename=data.tar.gz&disposition=attachment&hash=++6fwQGYQcslFHy7dzj3e+3J/uyYEquUqxV8CKH4W3U=&limit=0&content_type=application/gzip&fsize=139173022&hid=cea20f2b9a830f0b67b8044389b769a5&media_type=compressed&tknv=v2' \
         -O index.tar.gz
     rm -rf index
     tar -xzvf index.tar.gz
