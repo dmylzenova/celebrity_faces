@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 
+import numpy as np
 from dataset import FilesIndex, Dataset, Pipeline, B
 
 import pylsh
@@ -14,19 +15,26 @@ class MtController:
                  model_name='model-20170512-110547',
                  checkpoint='model-20170512-110547.ckpt-250000',
                  cropped_photos_dir=os.path.dirname(__file__) + '/app/static/cropped_photos',
-                 index_path=os.path.dirname(__file__) + '/app/static/index/',
+                 index_path=os.path.dirname(__file__) + '/app/static/data/',
                  haarcascade_xml_path=os.path.dirname(__file__) + '/app/static/haarcascade_frontalface_default.xml',
                  pylsh_params=(50, 64, 128)):
                
         self.cropped_photos_dir = cropped_photos_dir
         
         self.planes_path = (index_path + 'split.txt').encode(encoding='UTF-8')
-        self.hash_tables_dir_path = (index_path + 'index').encode(encoding='UTF-8')
+        self.hash_tables_dir_path = (index_path + 'index/').encode(encoding='UTF-8')
         self.index_embedding_dict_path = (index_path + 'index_embedding.txt').encode(encoding='UTF-8')
 
+        print('before lsh')
         self.index = pylsh.PyLSH(*pylsh_params)
         self.index.fill_data_from_files(planes_path=self.planes_path, hash_tables_dir_path=self.hash_tables_dir_path,
                                         index_embedding_dict_path=self.index_embedding_dict_path)
+        print('initialized lsh')
+        # test index
+        if len(self.index.find_k_neighbors(5, np.random.normal(0, 1, 128))) == 0:
+            print('EMPTY INDEX')
+        else:
+            print('successfully loaded LSH....')
 
         self.find_neighbours_ppl = (Pipeline()
                                          .load(fmt='image', components='images')
@@ -55,7 +63,7 @@ class MtController:
 
     def get_inference(self, path, images_count=1):
         print('GET_INFERENCE CALLED')
-        
+        print('here is what i got ', path)
         dset = self.build_ds(path)
         print('dataset has been built', dset.indices)
         pred = self.find_neighbours_ppl << dset
