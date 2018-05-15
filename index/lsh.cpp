@@ -264,7 +264,7 @@ unsigned long long LSH::get_hash(std::vector<double> point, size_t hash_table_in
 std::vector<int> LSH::dummy_k_neighbors(size_t k, std::vector<int> indexes,
                                         std::vector<std::vector<double> > embeddings,
                                         std::vector<double> given_point) {
-    std::set<size_t> answer;
+    std::vector<int> answer;
 
     std::vector<std::pair<size_t, double> > candidates;
     for (size_t i = 0; i < indexes.size(); ++i) {
@@ -274,18 +274,17 @@ std::vector<int> LSH::dummy_k_neighbors(size_t k, std::vector<int> indexes,
 
     std::sort(candidates.begin(), candidates.end(), sortbysecond());
     for (auto &candidate : candidates) {
-        answer.insert(candidate.first);
+        answer.push_back(static_cast<int>(candidate.first));
         if (answer.size() == k) {
             break;
         }
     }
-    std::vector<int> result(answer.begin(), answer.end());
-    return result;
+    return answer;
 }
 
 
 std::vector<int> LSH::find_k_neighbors(size_t k, std::vector<double> embedding) {
-    std::set<size_t> answer;
+    std::vector<int> answer;
     std::map<size_t , double> candidates;
     for (size_t hash_table_index = 0; hash_table_index < _num_hash_tables; ++hash_table_index) {
         unsigned long long hash_value = get_hash(embedding, hash_table_index);
@@ -303,12 +302,11 @@ std::vector<int> LSH::find_k_neighbors(size_t k, std::vector<double> embedding) 
     std::vector<std::pair<size_t, double> > candidates_list(candidates.begin(), candidates.end());
     std::sort(candidates_list.begin(), candidates_list.end(), sortbysecond());
 
-    for (auto &i : candidates_list) {
-        answer.insert(i.first);
+    for (auto &candidate : candidates_list) {
+        answer.push_back(static_cast<int>(candidate.first));
         if (answer.size() == k) {
             break;
         }
     }
-    std::vector<int> result(answer.begin(), answer.end());
-    return result;
+    return answer;
 }
