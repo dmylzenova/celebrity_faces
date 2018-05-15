@@ -32,7 +32,7 @@ cdef class PyLSH:
         self.thisptr = LSH(num_hash_tables, num_splits, dimension_size)
     def fill_data_from_files(self, planes_path, hash_tables_dir_path, index_embedding_dict_path):
         return self.thisptr.fill_data_from_files(planes_path, hash_tables_dir_path, index_embedding_dict_path)
-    def write_hash_tables_to_files(self, path_to_dir, hash_tables_dir_path, index_embedding_dict_path):
+    def write_hash_tables_to_files(self, path_to_dir):
         return self.thisptr.write_hash_tables_to_files(path_to_dir)
     def write_index_embedding_dict(self, path_to_file):
         return self.thisptr.write_index_embedding_dict(path_to_file)
