@@ -265,9 +265,9 @@ unsigned long long LSH::get_hash(std::vector<double> point, size_t hash_table_in
 std::vector<int> LSH::dummy_k_neighbors(size_t k, std::vector<int> indexes,
                                         std::vector<std::vector<double> > embeddings,
                                         std::vector<double> given_point) {
-    std::set<int> answer;
+    std::set<size_t> answer;
 
-    std::vector<std::pair<int, double> > candidates;
+    std::vector<std::pair<size_t, double> > candidates;
     for (size_t i = 0; i < indexes.size(); ++i) {
         double curr_distance = calculate_distance(embeddings[i], given_point);
         candidates.emplace_back(std::make_pair(indexes[i], curr_distance));
@@ -286,22 +286,26 @@ std::vector<int> LSH::dummy_k_neighbors(size_t k, std::vector<int> indexes,
 
 
 std::vector<int> LSH::find_k_neighbors(size_t k, std::vector<double> embedding) {
-    std::set<int> answer;
-    std::vector<std::pair<int, double> > candidates;
+    std::set<size_t> answer;
+    std::map<size_t , double> candidates;
     for (size_t hash_table_index = 0; hash_table_index < _num_hash_tables; ++hash_table_index) {
         unsigned long long hash_value = get_hash(embedding, hash_table_index);
         std::set<size_t > img_ids = _hash_tables[hash_table_index][hash_value];
         for (auto &cur_img_id : img_ids) {
             auto &candidate_img_embedding = _img_index_to_embedding.at(cur_img_id);
-            candidates.emplace_back(std::make_pair(cur_img_id, calculate_distance(candidate_img_embedding, embedding)));
+            if (candidates.find(cur_img_id) == candidates.end()) {
+                candidates.insert(std::make_pair(cur_img_id, calculate_distance(candidate_img_embedding, embedding)));
+            }
         }
     }
-    std::sort(candidates.begin(), candidates.end(), sortbysecond());
     if (candidates.empty()) {
         return {};
     }
-    for (size_t i = 1; i < candidates.size(); ++i) {
-        answer.insert(candidates[i].first);
+    std::vector<std::pair<size_t, double> > candidates_list(candidates.begin(), candidates.end());
+    std::sort(candidates_list.begin(), candidates_list.end(), sortbysecond());
+
+    for (size_t i = 1; i < candidates_list.size(); ++i) {
+        answer.insert(candidates_list[i].first);
         if (answer.size() == k) {
             break;
         }

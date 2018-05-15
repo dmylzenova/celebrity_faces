@@ -38,11 +38,12 @@ public:
     unsigned long long get_hash(std::vector<double> point, size_t hash_table_index);
 
     std::vector<int> find_k_neighbors(size_t k, std::vector<double> embedding);
-    std::vector<int> dummy_k_neighbors(size_t k, std::vector<int> indexes, std::vector<std::vector<double> > embeddings,
-                                       std::vector<double> given_point);
+    std::vector<int> dummy_k_neighbors(size_t k, std::vector<int> indexes,
+                                          std::vector<std::vector<double> > embeddings,
+                                          std::vector<double> given_point);
 
     struct sortbysecond {
-        bool operator()(const std::pair<int, double> &a, const std::pair<int, double> &b) const {
+        bool operator()(const std::pair<size_t, double> &a, const std::pair<size_t, double> &b) const {
             return a.second <= b.second;
         }
     };
