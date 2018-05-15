@@ -3,6 +3,7 @@ import pandas as pd
 
 from dataset import FilesIndex, Dataset, Pipeline, B
 
+import pylsh
 import face_batch
 import model
 
@@ -13,10 +14,21 @@ class MtController:
                  model_name='model-20170512-110547',
                  checkpoint='model-20170512-110547.ckpt-250000',
                  cropped_photos_dir='cropped_photos',
-                 index_path=os.path.dirname(__file__) + '/app/static/index/150k_50t_index.ann',
+                 index_path=os.path.dirname(__file__) + '/app/static/index_data/',
                  int_mapping_file=os.path.dirname(__file__) + '/app/static/index/int_indices_mapping.csv',
-                 haarcascade_xml_path=os.path.dirname(__file__) + '/app/static/haarcascade_frontalface_default.xml'):
+                 haarcascade_xml_path=os.path.dirname(__file__) + '/app/static/haarcascade_frontalface_default.xml',
+                 pylsh_params=(50, 64, 128)):
+               
         self.cropped_photos_dir = cropped_photos_dir
+        
+        self.planes_path = (index_path + 'split.txt').encode(encoding='UTF-8')
+        self.hash_tables_dir_path = (index_path + 'index').encode(encoding='UTF-8')
+        self.index_embedding_dict_path = (index_path + 'index_embedding.txt').encode(encoding='UTF-8')
+
+
+        self.index = pylsh.PyLSH(*pylsh_params)
+        self.index.fill_data_from_files(planes_path=self.planes_path, hash_tables_dir_path=self.hash_tables_dir_path,
+                                        index_embedding_dict_path=self.index_embedding_dict_path)
 
         self.find_neighbours_ppl = (Pipeline()
                                          .load(fmt='image', components='images')
@@ -34,8 +46,9 @@ class MtController:
                                          .predict_model(model_name, fetches="embeddings:0",
                                                         feed_dict={'input:0': B('images'), 'phase_train:0': False},
                                                         save_to=B('embedding'), mode='w')
-                                         .find_nearest_neighbours(src=index_path, k_neighbours=k_neighbours)
+                                         .find_nearest_neighbours(self.index, k_neighbours=k_neighbours, use_pylsh=True)
                                    )
+
         self.indices_mapping = pd.read_csv(int_mapping_file, names=['file_name', 'int_index'], index_col='int_index')
         print('Initialized MtController...')
 
