@@ -14,7 +14,7 @@ cd $HOME/celebrity_faces/index && sudo python3 setup.py build_ext --inplace && c
 # Upload data
 cd $HOME/celebrity_faces/viewer/app/static
 if [ ! -f model.zip ]; then
-    wget 'https://downloader.disk.yandex.ru/disk/c2e34c3c49a64b55f37be8123aa23b8a0ab2ff7cfe95895dc8be2a433227e144/5af7ddcc/ddZ6cPttF3My8iD24FAVMGih0Y48jpk0L8HqWhH8T8uJd3oy42om7dvGdDthoDm11gjlbipE8-KemsJlt_0WsA%3D%3D?uid=0&filename=model.zip&disposition=attachment&hash=g1kEsVlquYHXVsRHYxcZqBD6M/zUVQn%2B%2BVPQwis107Y%3D&limit=0&content_type=application%2Fx-zip-compressed&fsize=192225146&hid=3194ee851e6f825d5717ee58e886c511&media_type=compressed&tknv=v2' \
+    wget 'https://downloader.disk.yandex.ru/disk/07dc3096fefad426f42cd0eb3f9b63c8278c5850cdac2d79e8e6fa2fba597876/5afb3b85/ddZ6cPttF3My8iD24FAVMGih0Y48jpk0L8HqWhH8T8uJd3oy42om7dvGdDthoDm11gjlbipE8-KemsJlt_0WsA==?uid=264449331&filename=model.zip&disposition=attachment&hash=&limit=0&content_type=application/x-zip-compressed&fsize=192225146&hid=3194ee851e6f825d5717ee58e886c511&media_type=compressed&tknv=v2&etag=884877488a490e6622acb6ad773ea9e2'
         -O model.zip
     rm -rf model
     unzip model.zip
@@ -28,7 +28,7 @@ if [ ! -f index.zip ]; then
 fi
 
 if [ ! -f cropped_photos.zip ]; then
-    wget 'https://downloader.disk.yandex.ru/disk/1e1a11d600fcc976238f6ea9f9a4330216f12cca314dda9e6158b48a53efec71/5af7dc47/ddZ6cPttF3My8iD24FAVMNMVwbHXYPOtYUfz0SZYfxH4mFRft67jMJo_GH5EjeEpmnhqvnutlhOthPxqre2UjA%3D%3D?uid=0&filename=cropped_photos.zip&disposition=attachment&hash=feWHaLxtk1%2B8dmL0kDELoAtGd9yXP8yu5rSTpmx4ucM%3D&limit=0&content_type=application%2Fx-zip-compressed&fsize=743778718&hid=43983205d7b1bae83ea31cf278897abd&media_type=compressed&tknv=v2' \
+    wget 'https://downloader.disk.yandex.ru/disk/3f47ab4e9a7a6c1a07a6d4133fe6fc250a1e3affdc7ae1c7ae678cdd690437ca/5afb3b6b/ddZ6cPttF3My8iD24FAVMGih0Y48jpk0L8HqWhH8T8uJd3oy42om7dvGdDthoDm11gjlbipE8-KemsJlt_0WsA==?uid=0&filename=model.zip&disposition=attachment&hash=g1kEsVlquYHXVsRHYxcZqBD6M/zUVQn++VPQwis107Y=&limit=0&content_type=application/x-zip-compressed&fsize=192225146&hid=3194ee851e6f825d5717ee58e886c511&media_type=compressed&tknv=v2' \
         -O cropped_photos.zip
     unzip cropped_photos.zip
 fi
