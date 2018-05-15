@@ -8,7 +8,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+    return '.' in filename and str.lower(filename.rsplit('.', 1)[1]) in ALLOWED_EXTENSIONS
 
 
 @app.route('/')
@@ -34,6 +34,10 @@ def index():
 @app.route('/result/<filename>')
 def result(filename):
     init_photo = filename
-    celebrity_photos = mt.get_inference(os.path.dirname(__file__) + "/static/uploaded_img/" + init_photo,
-                                        images_count=8)
+    init_photo_abs_path = os.path.dirname(__file__) + "/static/uploaded_img/" + init_photo
+    if not os.path.isfile(init_photo_abs_path):
+        flask.flash(u'Файл с именем "%s" не загружен. Сначала загрузи фото.' % filename, category='error')
+        return flask.redirect(flask.url_for("index"))
+
+    celebrity_photos = mt.get_inference(init_photo_abs_path, images_count=8)
     return flask.render_template('result.html', init_photo=init_photo, celebrity_photos=celebrity_photos)
