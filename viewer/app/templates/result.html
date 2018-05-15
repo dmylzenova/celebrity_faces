@@ -3,6 +3,8 @@
     <h1>Results</h1>
     Твоё фото: <br>
     <img src="/static/uploaded_img/{{ init_photo }}" width="200"> <br>
+    Посмотрим поближе:<br>
+    <img src="/static/uploaded_img/{{ cropped_photo }}" width="200"> <br>
     Знаменитости, на которых ты похож: <br>
     <img src="/static/cropped_photos/{{ celebrity_photos[0] }}" width="200"><br>
     {% for photo in celebrity_photos[1:] %}

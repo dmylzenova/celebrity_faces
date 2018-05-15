@@ -1,7 +1,5 @@
 import os
-import pandas as pd
-
-import numpy as np
+import imageio
 from dataset import FilesIndex, Dataset, Pipeline, B
 
 import pylsh
@@ -62,14 +60,21 @@ class MtController:
         print('BUILDING DATASET')
         return Dataset(index=FilesIndex(path=path), batch_class=face_batch.CelebrityBatch)
 
-    def get_inference(self, path, images_count=1):
+    def get_inference(self, dir_path, name, images_count=1):
         print('GET_INFERENCE CALLED')
-        print('here is what i got ', path)
-        dset = self.build_ds(path)
+        src = dir_path + name
+        imageio.imread(src)
+
+        print('here is what i got ', src)
+        dset = self.build_ds(src)
         print('dataset has been built', dset.indices)
         pred = self.find_neighbours_ppl << dset
         print('created pred')
         batch = pred.next_batch(1)
         print('got next batch')
+        cropped_image = batch.images[0]
+        dst = dir_path + 'cropped.png'
+        imageio.imsave(cropped_image, dir_path + dst)
+        print('saved cropped image to ', dst)
         knn_files = [str(current) + '.jpg' for current in batch.neighbours[0][:images_count]]
-        return knn_files
+        return dst, knn_files

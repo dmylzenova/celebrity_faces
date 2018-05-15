@@ -33,11 +33,11 @@ def index():
 
 @app.route('/result/<filename>')
 def result(filename):
-    init_photo = filename
-    init_photo_abs_path = os.path.dirname(__file__) + "/static/uploaded_img/" + init_photo
-    if not os.path.isfile(init_photo_abs_path):
+    init_photo_abs_dir = os.path.dirname(__file__) + "/static/uploaded_img/"
+    if not os.path.isfile(init_photo_abs_dir + filename):
         flask.flash(u'Файл с именем "%s" не загружен. Сначала загрузи фото.' % filename, category='error')
         return flask.redirect(flask.url_for("index"))
 
-    celebrity_photos = mt.get_inference(init_photo_abs_path, images_count=8)
-    return flask.render_template('result.html', init_photo=init_photo, celebrity_photos=celebrity_photos)
+    cropped_photo, celebrity_photos = mt.get_inference(init_photo_abs_dir, filename, images_count=8)
+    return flask.render_template('result.html', init_photo=filename, cropped_photo=cropped_photo,
+                                 celebrity_photos=celebrity_photos)
