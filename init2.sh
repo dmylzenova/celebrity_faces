@@ -14,7 +14,7 @@ cd $HOME/celebrity_faces/index && python3 setup.py build_ext --inplace && cp pyl
 # Upload data
 cd $HOME/celebrity_faces/viewer/app/static
 if [ ! -f model.zip ]; then
-    wget 'https://downloader.disk.yandex.ru/disk/07dc3096fefad426f42cd0eb3f9b63c8278c5850cdac2d79e8e6fa2fba597876/5afb3b85/ddZ6cPttF3My8iD24FAVMGih0Y48jpk0L8HqWhH8T8uJd3oy42om7dvGdDthoDm11gjlbipE8-KemsJlt_0WsA==?uid=264449331&filename=model.zip&disposition=attachment&hash=&limit=0&content_type=application/x-zip-compressed&fsize=192225146&hid=3194ee851e6f825d5717ee58e886c511&media_type=compressed&tknv=v2&etag=884877488a490e6622acb6ad773ea9e2' \
+    wget 'https://downloader.disk.yandex.ru/disk/77b3ccdddbd9bb0a126df87a9d2b021b6356b240137ab98c5e4fdd4bf6b0fa5e/5afb7a80/ddZ6cPttF3My8iD24FAVMGih0Y48jpk0L8HqWhH8T8uJd3oy42om7dvGdDthoDm11gjlbipE8-KemsJlt_0WsA==?uid=0&filename=model.zip&disposition=attachment&hash=g1kEsVlquYHXVsRHYxcZqBD6M/zUVQn++VPQwis107Y=&limit=0&content_type=application/x-zip-compressed&fsize=192225146&hid=3194ee851e6f825d5717ee58e886c511&media_type=compressed&tknv=v2' \
         -O model.zip
     rm -rf model
     unzip model.zip
