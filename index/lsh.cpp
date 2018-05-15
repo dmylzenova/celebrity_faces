@@ -49,12 +49,14 @@ read_planes_from_file(size_t num_hash_tables, size_t num_splits, const std::stri
 }
 
 
-std::unordered_map<std::string, std::vector<embedding_type> > read_map_from_one_file(const std::string &name) {
-    std::ifstream file(name);
-    std::unordered_map<std::string, std::vector<embedding_type> > result;
+std::unordered_map<unsigned long long, std::vector<embedding_type> > read_map_from_one_file(const std::string &name) {
+    std::unordered_map<unsigned long long, std::vector<embedding_type> > result;
     std::string line;
-    std::string key;
+    unsigned long long key = 0;
     bool new_key = true;
+    size_t sz = 0;
+
+    std::ifstream file(name);
     if (file.is_open()) {
         while (getline(file, line)) {
             if (line.empty()) {
@@ -63,7 +65,7 @@ std::unordered_map<std::string, std::vector<embedding_type> > read_map_from_one_
                 getline(file, line);
             }
             if (new_key) {
-                key = line;
+                key = std::stoull(line, &sz, 0);
                 getline(file, line);
             }
             if (line.empty()) {
@@ -90,9 +92,9 @@ std::unordered_map<std::string, std::vector<embedding_type> > read_map_from_one_
 }
 
 
-std::vector<std::unordered_map<std::string, std::vector<embedding_type> > >
+std::vector<std::unordered_map<unsigned long long, std::vector<embedding_type> > >
 read_map_from_files(size_t num_hash_tables, const std::string &path_to_dir) {
-    std::vector<std::unordered_map<std::string, std::vector<embedding_type> > > answer;
+    std::vector<std::unordered_map<unsigned long long, std::vector<embedding_type> > > answer;
     for (size_t i = 0; i < num_hash_tables; ++i) {
         std::string name = path_to_dir + std::to_string(i) + ".txt";
         answer.push_back(read_map_from_one_file(name));
@@ -104,10 +106,11 @@ read_map_from_files(size_t num_hash_tables, const std::string &path_to_dir) {
 LSH::LSH() = default;
 
 
-LSH::LSH(size_t num_hash_tables, size_t num_splits, size_t dimension_size, std::string path_to_dir = "") {
+LSH::LSH(size_t num_hash_tables, size_t num_splits, size_t dimension_size, std::string path_to_dir) {
     _num_hash_tables = num_hash_tables;
     _num_splits = num_splits;
     _dimension_size = dimension_size;
+
     if (path_to_dir.empty()) {
         _planes.resize(num_hash_tables);
         for (size_t i = 0; i < num_hash_tables; ++i) {
@@ -214,19 +217,13 @@ void LSH::create_splits(const std::string &path_to_dir) {
 }
 
 
-std::string LSH::get_hash(std::vector<double> point, size_t hash_table_index) {
-    std::string hash_value;
-    hash_value.resize(_num_splits);
+unsigned long long LSH::get_hash(std::vector<double> point, size_t hash_table_index) {
+    std::bitset<64> hash_value;
     std::vector<double> values = multiply(_planes[hash_table_index], point);
     for (size_t indx = 0; indx < _num_splits; ++indx) {
-        if (values[indx] > 0) {
-            hash_value[indx] = '1';
-
-        } else {
-            hash_value[indx] = '0';
-        }
+        hash_value[indx] = values[indx] > 0;
     }
-    return hash_value;
+    return hash_value.to_ullong();
 }
 
 
@@ -259,7 +256,7 @@ void LSH::add_to_table(int index, std::vector<double> embedding) {
     point._image_index = index;
     point._emb = std::move(embedding);
     for (size_t i = 0; i < _num_hash_tables; ++i) {
-        std::string hash_val = get_hash(point._emb, i);
+        unsigned long long hash_val = get_hash(point._emb, i);
         this->_hash_tables[i][hash_val].push_back(point);
     }
 }
@@ -269,7 +266,7 @@ std::vector<int> LSH::find_k_neighboors(size_t k, std::vector<double> embedding)
     std::set<int> answer;
     std::vector<std::pair<int, double> > candidates;
     for (size_t i = 0; i < _num_hash_tables; ++i) {
-        std::string hash_value = get_hash(embedding, i);
+        unsigned long long hash_value = get_hash(embedding, i);
         std::vector<embedding_type> result_points = _hash_tables[i][hash_value];
         for (auto &result_point : result_points) {
             candidates.emplace_back(std::make_pair(result_point._image_index,
@@ -289,4 +286,3 @@ std::vector<int> LSH::find_k_neighboors(size_t k, std::vector<double> embedding)
     std::vector<int> result(answer.begin(), answer.end());
     return result;
 }
-
