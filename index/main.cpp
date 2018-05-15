@@ -47,5 +47,8 @@ int main() {
 
     std::vector<int> answer1 = lsh.dummy_k_neighbors(2, indexes, embeddings, e);
 
+    // test asser
+//    LSH lsh2(2, 65, 13);
+
     return 0;
 }

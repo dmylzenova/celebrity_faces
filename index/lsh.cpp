@@ -1,4 +1,5 @@
 #include "lsh.h"
+#include <cassert>
 
 
 void write_planes_to_file(std::vector<std::vector<std::vector<double> > > planes, const std::string &path_to_dir) {
@@ -107,6 +108,8 @@ LSH::LSH() = default;
 
 
 LSH::LSH(size_t num_hash_tables, size_t num_splits, size_t dimension_size, std::string path_to_dir) {
+    assert(num_splits <= 64);
+
     _num_hash_tables = num_hash_tables;
     _num_splits = num_splits;
     _dimension_size = dimension_size;
