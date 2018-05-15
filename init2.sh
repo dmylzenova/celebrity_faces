@@ -28,7 +28,7 @@ if [ ! -f index.tar.gz ]; then
 fi
 
 if [ ! -f cropped_photos.zip ]; then
-    wget 'https://s92vla.storage.yandex.net/rdisk/40a152210598322b047eb94ebb5a5035d3bad87391351c09f8357d810f31cc0a/5afb77eb/ddZ6cPttF3My8iD24FAVMNMVwbHXYPOtYUfz0SZYfxH4mFRft67jMJo_GH5EjeEpmnhqvnutlhOthPxqre2UjA==?uid=0&filename=cropped_photos.zip&disposition=attachment&hash=feWHaLxtk1%2B8dmL0kDELoAtGd9yXP8yu5rSTpmx4ucM%3D&limit=0&content_type=application%2Fx-zip-compressed&fsize=743778718&hid=43983205d7b1bae83ea31cf278897abd&media_type=compressed&tknv=v2&rtoken=UYoGa5F0h6Bd&force_default=no&ycrid=na-aef3c34f09b0170df7a48749409c5c34-downloader10e&ts=56c479a8d90c0&s=a0e339b340fdbfbb790e1133f0c1c18639aff76e6828bd796f238b94e1df62bf&pb=U2FsdGVkX1-fJa_5OvmOfysoIxntcm0vLIEpruvP6Ouf42P6IzWvziOb-62Czch-VdGON3hiaOmhV2GGQnnYct5HFknZewLyo2CgAqTug7Q' \
+    wget 'https://downloader.disk.yandex.ru/disk/c6862ec3b05af70542b7bc6b27729fa77b7b99fc9493007d63a4e48009ee4885/5afb78fc/ddZ6cPttF3My8iD24FAVMNMVwbHXYPOtYUfz0SZYfxH4mFRft67jMJo_GH5EjeEpmnhqvnutlhOthPxqre2UjA==?uid=0&filename=cropped_photos.zip&disposition=attachment&hash=feWHaLxtk1+8dmL0kDELoAtGd9yXP8yu5rSTpmx4ucM=&limit=0&content_type=application/x-zip-compressed&fsize=743778718&hid=43983205d7b1bae83ea31cf278897abd&media_type=compressed&tknv=v2' \
         -O cropped_photos.zip
     unzip cropped_photos.zip
 fi
