@@ -14,7 +14,7 @@ class MtController:
                  model_name='model-20170512-110547',
                  checkpoint='model-20170512-110547.ckpt-250000',
                  cropped_photos_dir='cropped_photos',
-                 index_path=os.path.dirname(__file__) + '/app/static/index_data/',
+                 index_path=os.path.dirname(__file__) + '/app/static/index/',
                  int_mapping_file=os.path.dirname(__file__) + '/app/static/index/int_indices_mapping.csv',
                  haarcascade_xml_path=os.path.dirname(__file__) + '/app/static/haarcascade_frontalface_default.xml',
                  pylsh_params=(50, 64, 128)):

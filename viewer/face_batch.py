@@ -74,7 +74,7 @@ class CelebrityBatch(ImagesBatch):
 
     @action
     @inbatch_parallel(init='images', post='_assemble', components='coordinates')
-    def detect_face(self, image):
+    def detect_face(self, image, haarcascade_xml_path='haarcascade_frontalface_default.xml'):
         """
         Finds coordinates of the single face on the image using haarcascade from cv2.
         Parameters
@@ -87,7 +87,7 @@ class CelebrityBatch(ImagesBatch):
         bbox : tuple or list
             face's bounding box in format (x, y, w, h)
         """
-        face_cascade = cv.CascadeClassifier('haarcascade_frontalface_default.xml')
+        face_cascade = cv.CascadeClassifier(haarcascade_xml_path)
         gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
         try:
             faces = face_cascade.detectMultiScale(gray, 1.3, 5)
@@ -96,7 +96,6 @@ class CelebrityBatch(ImagesBatch):
             return [0, 0, image.shape[1], image.shape[0]]
         if len(faces) > 1:
             print('detect_face has found more than one face')
-            raise ValueError
         try:
             return faces[0]
         except Exception as e:
