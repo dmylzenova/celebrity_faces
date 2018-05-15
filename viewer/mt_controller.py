@@ -13,9 +13,8 @@ class MtController:
                  model_path=os.path.dirname(__file__) + '/app/static/model',
                  model_name='model-20170512-110547',
                  checkpoint='model-20170512-110547.ckpt-250000',
-                 cropped_photos_dir='cropped_photos',
+                 cropped_photos_dir=os.path.dirname(__file__) + '/app/static/cropped_photos',
                  index_path=os.path.dirname(__file__) + '/app/static/index/',
-                 int_mapping_file=os.path.dirname(__file__) + '/app/static/index/int_indices_mapping.csv',
                  haarcascade_xml_path=os.path.dirname(__file__) + '/app/static/haarcascade_frontalface_default.xml',
                  pylsh_params=(50, 64, 128)):
                
@@ -24,7 +23,6 @@ class MtController:
         self.planes_path = (index_path + 'split.txt').encode(encoding='UTF-8')
         self.hash_tables_dir_path = (index_path + 'index').encode(encoding='UTF-8')
         self.index_embedding_dict_path = (index_path + 'index_embedding.txt').encode(encoding='UTF-8')
-
 
         self.index = pylsh.PyLSH(*pylsh_params)
         self.index.fill_data_from_files(planes_path=self.planes_path, hash_tables_dir_path=self.hash_tables_dir_path,
@@ -49,7 +47,6 @@ class MtController:
                                          .find_nearest_neighbours(self.index, k_neighbours=k_neighbours, use_pylsh=True)
                                    )
 
-        self.indices_mapping = pd.read_csv(int_mapping_file, names=['file_name', 'int_index'], index_col='int_index')
         print('Initialized MtController...')
 
     def build_ds(self, path):

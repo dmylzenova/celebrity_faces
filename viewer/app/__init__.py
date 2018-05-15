@@ -8,7 +8,7 @@ mt = None
 
 
 def init_app(uploaded_img_path, model_path, model_name, checkpoint,
-             cropped_photos_dir, index_path, int_mapping_file, haarcascade_xml_path):
+             cropped_photos_dir, index_path, haarcascade_xml_path):
     global app, photos, mt
 
     app = Flask(__name__)
@@ -25,7 +25,6 @@ def init_app(uploaded_img_path, model_path, model_name, checkpoint,
         checkpoint=checkpoint,
         cropped_photos_dir=cropped_photos_dir,
         index_path=index_path,
-        int_mapping_file=int_mapping_file,
         haarcascade_xml_path=haarcascade_xml_path
     )
 

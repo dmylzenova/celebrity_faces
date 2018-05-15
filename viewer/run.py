@@ -20,9 +20,7 @@ def parse_args():
     parser.add_argument("--debug", action="store_true", default=False)
     parser.add_argument("--model-dir-path", type=str, default=os.path.dirname(__file__) + '/app/static/model')
     parser.add_argument("--index-path", type=str,
-                        default=os.path.dirname(__file__) + '/app/static/index/150k_50t_index.ann')
-    parser.add_argument("--int-mapping-path", type=str,
-                        default=os.path.dirname(__file__) + '/app/static/index/int_indices_mapping.csv')
+                        default=os.path.dirname(__file__) + '/app/static/index/')
     parser.add_argument("--model-name", type=str, default="model-20170512-110547")
     parser.add_argument("--checkpoint", type=str, default="model-20170512-110547.ckpt-250000")
     parser.add_argument("--haarcascade-xml-path", type=str,
@@ -42,7 +40,7 @@ def main():
     app.init_app(os.path.dirname(__file__) + '/app/static/uploaded_img',
                  args.model_dir_path, args.model_name, args.checkpoint,
                  os.path.dirname(__file__) + '/app/static/cropped_photos',
-                 args.index_path, args.int_mapping_path, args.haarcascade_xml_path)
+                 args.index_path, args.haarcascade_xml_path)
     app.app.debug = args.debug
 
     if args.log_file_path:
