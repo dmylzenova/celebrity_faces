@@ -29,7 +29,7 @@ int main() {
 
     // find neighbors
     LSH lsh1(2, 4, 13, "data/");
-    std::vector<int> answer = lsh1.find_k_neighboors(2, e);
+    std::vector<int> answer = lsh1.find_k_neighbors(2, e);
 
     // dummy k_neighbors
 
@@ -45,7 +45,7 @@ int main() {
     embeddings.push_back(c);
     embeddings.push_back(d);
 
-    std::vector<int> answer1 = lsh.dummy_k_neighboors(2, indexes, embeddings, e);
+    std::vector<int> answer1 = lsh.dummy_k_neighbors(2, indexes, embeddings, e);
 
     return 0;
 }

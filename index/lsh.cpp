@@ -227,8 +227,9 @@ unsigned long long LSH::get_hash(std::vector<double> point, size_t hash_table_in
 }
 
 
-std::vector<int> LSH::dummy_k_neighboors(size_t k, std::vector<int> indexes, std::vector<std::vector<double> > embeddings,
-                                         std::vector<double> given_point) {
+std::vector<int> LSH::dummy_k_neighbors(size_t k, std::vector<int> indexes,
+                                        std::vector<std::vector<double> > embeddings,
+                                        std::vector<double> given_point) {
     std::vector<int> answer;
     std::vector<embedding_type> points;
     for (std::size_t i = 0; i < indexes.size(); ++i) {
@@ -262,7 +263,7 @@ void LSH::add_to_table(int index, std::vector<double> embedding) {
 }
 
 
-std::vector<int> LSH::find_k_neighboors(size_t k, std::vector<double> embedding) {
+std::vector<int> LSH::find_k_neighbors(size_t k, std::vector<double> embedding) {
     std::set<int> answer;
     std::vector<std::pair<int, double> > candidates;
     for (size_t i = 0; i < _num_hash_tables; ++i) {

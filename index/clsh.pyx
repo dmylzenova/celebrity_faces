@@ -17,9 +17,9 @@ cdef extern from "lsh.h":
         void write_map_to_file(string)
         void create_splits(string)
         void add_to_table(int, cpp_vector_double)
-        cpp_vector_int find_k_neighboors(size_t, cpp_vector_double)
-        cpp_vector_int dummy_k_neighboors(size_t, cpp_vector_int, cpp_vec_vec_double, cpp_vector_double)
-        string get_hash(cpp_vector_double, size_t)
+        cpp_vector_int find_k_neighbors(size_t, cpp_vector_double)
+        cpp_vector_int dummy_k_neighbors(size_t, cpp_vector_int, cpp_vec_vec_double, cpp_vector_double)
+        unsigned long long get_hash(cpp_vector_double, size_t)
         double calculate_distance(cpp_vector_double&, cpp_vector_double&)
 
 
@@ -33,10 +33,10 @@ cdef class PyLSH:
         return self.thisptr.create_splits(path_to_dir)
     def add_to_table(self, index, embedding):
         return self.thisptr.add_to_table(index, embedding)
-    def find_k_neighboors(self, k, point):
-        return self.thisptr.find_k_neighboors(k, point)
-    def dummy_k_neighboors(self, k, indexes, embeddings, given_point):
-        return self.thisptr.dummy_k_neighboors(k, indexes, embeddings, given_point)
+    def find_k_neighbors(self, k, point):
+        return self.thisptr.find_k_neighbors(k, point)
+    def dummy_k_neighbors(self, k, indexes, embeddings, given_point):
+        return self.thisptr.dummy_k_neighbors(k, indexes, embeddings, given_point)
     def get_hash(self, point, hash_table_index):
         return self.thisptr.get_hash(point, hash_table_index)
     def calculate_distance(self, v_first, v_sec):

@@ -41,9 +41,9 @@ public:
     void create_splits(const std::string &path_to_dir);
     unsigned long long get_hash(std::vector<double> point, size_t hash_table_index);
     void add_to_table(int index, std::vector<double> embedding);
-    std::vector<int> find_k_neighboors(size_t k, std::vector<double> embedding);
-    std::vector<int> dummy_k_neighboors(size_t k, std::vector<int> indexes, std::vector<std::vector<double> > embeddings,
-                                        std::vector<double> given_point);
+    std::vector<int> find_k_neighbors(size_t k, std::vector<double> embedding);
+    std::vector<int> dummy_k_neighbors(size_t k, std::vector<int> indexes, std::vector<std::vector<double> > embeddings,
+                                       std::vector<double> given_point);
 
 protected:
     size_t _num_hash_tables;
