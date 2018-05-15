@@ -274,8 +274,8 @@ std::vector<int> LSH::dummy_k_neighbors(size_t k, std::vector<int> indexes,
     }
 
     std::sort(candidates.begin(), candidates.end(), sortbysecond());
-    for (size_t i = 1; i < candidates.size(); ++i) {
-        answer.insert(candidates[i].first);
+    for (auto &candidate : candidates) {
+        answer.insert(candidate.first);
         if (answer.size() == k) {
             break;
         }
