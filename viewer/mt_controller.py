@@ -73,8 +73,8 @@ class MtController:
         batch = pred.next_batch(1)
         print('got next batch')
         cropped_image = batch.images[0]
-        dst = dir_path + 'cropped.png'
-        imageio.imsave(cropped_image, dir_path + dst)
+        dst = name + '_cropped.png'
+        imageio.imsave(dir_path + dst, cropped_image)
         print('saved cropped image to ', dst)
         knn_files = [str(current) + '.jpg' for current in batch.neighbours[0][:images_count]]
         return dst, knn_files
