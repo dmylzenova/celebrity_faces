@@ -28,7 +28,7 @@ if [ ! -f index.tar.gz ]; then
 fi
 
 if [ ! -f cropped_photos.zip ]; then
-    wget 'https://downloader.disk.yandex.ru/disk/4d6554eac43fcce5986cf5cc4bb1c74f2de050d4fd87a21104360925acadeb96/5afb7c77/ddZ6cPttF3My8iD24FAVMNMVwbHXYPOtYUfz0SZYfxH4mFRft67jMJo_GH5EjeEpmnhqvnutlhOthPxqre2UjA==?uid=0&filename=cropped_photos.zip&disposition=attachment&hash=feWHaLxtk1+8dmL0kDELoAtGd9yXP8yu5rSTpmx4ucM=&limit=0&content_type=application/x-zip-compressed&fsize=743778718&hid=43983205d7b1bae83ea31cf278897abd&media_type=compressed&tknv=v2' \
+    wget 'https://downloader.disk.yandex.ru/disk/767b9ff6af4a2724ee11611922b4fd90502f80796b73ab50a953050c1234298a/5afb8249/ddZ6cPttF3My8iD24FAVMNMVwbHXYPOtYUfz0SZYfxH4mFRft67jMJo_GH5EjeEpmnhqvnutlhOthPxqre2UjA==?uid=0&filename=cropped_photos.zip&disposition=attachment&hash=feWHaLxtk1+8dmL0kDELoAtGd9yXP8yu5rSTpmx4ucM=&limit=0&content_type=application/x-zip-compressed&fsize=743778718&hid=43983205d7b1bae83ea31cf278897abd&media_type=compressed&tknv=v2' \
         -O cropped_photos.zip
     unzip cropped_photos.zip
 fi
