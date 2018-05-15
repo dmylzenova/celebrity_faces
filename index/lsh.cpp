@@ -304,8 +304,8 @@ std::vector<int> LSH::find_k_neighbors(size_t k, std::vector<double> embedding) 
     std::vector<std::pair<size_t, double> > candidates_list(candidates.begin(), candidates.end());
     std::sort(candidates_list.begin(), candidates_list.end(), sortbysecond());
 
-    for (size_t i = 1; i < candidates_list.size(); ++i) {
-        answer.insert(candidates_list[i].first);
+    for (auto &i : candidates_list) {
+        answer.insert(i.first);
         if (answer.size() == k) {
             break;
         }
