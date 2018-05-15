@@ -1,74 +1,49 @@
 # celebrity_faces
 
-`Celebrity faces` is a project which supports a site where you can load your photo and get back photo of
-a celebrity who looks the most like you.
+При реализации нашего проекта мы прошли через 3 этапа:
+	1. Прокрастинация и построение воздушных замков
+	2. Закапывание в несущественных деталях
+	3. Агония подвешенного в предпоследнем (он знает, что дальше будет еще хуже) кругу ада по Данте Алигьери.
 
-## How does it work:
-Project/face_batch.py contains class CelebrityBatch which has methods for data preproccesing, Index creation and search for k approximate nearest neghbours. At the moment it utilizes spotify's [Annoy](https://github.com/spotify/annoy).
+А если серьезно, мы хотели рассказать о 3 очевидных составляющих проекта:
+	1. Индекс для приближенного поиска соседей на С++
+	2. Рабочий пайплайн, принимающий на вход картинку и возвращающий K ближайших соседей на питоне
+	3. Докер-контейнер, на котором развернут сайт.
 
-CelebrityBatch class is inherited from [dataset's](https://github.com/analysiscenter/dataset) ImagesBatch 
-for flexible and easy looking workflows.
+Подробнее о каждом из пунктов:
+	1. Мы реализовали старый добрый LSH c косинусным расстоянием. Казалось бы, он достаточно прозрачен и накосячить в нем сложно. Но нам это удалось! Мы тестировали и смотрели на него, пока из наших глаз не потекли слезы, но все-таки нашли крошечную ошибку в коде, которая отравляла всю нашу жизнь.
+	В остальном - LSH изящен и прост, о нем нам рассказывали на лекции, может оказаться полезен в любой ситуации (т.е. метрике).
 
-An instance of CelebrityBatch represents data batch and stores components: `images`, `coordinates`, `embedding`, etc.
+	Сравнение:
+	# TO DO
 
-Thus, image preproccesing pipeline looks like this:
+	Самым проблематичным в этом пункте было настроить импорт в питон.
 
-```python
-preprocess_ppl = (Pipeline()
-     .load_cv(src=src_images, fmt='cv', components='images')
-     .detect_face()
-     .crop_from_bbox()          
-     .resize(IMG_SHAPE, fmt='cv')
-     .to_rgb()
-     .to_pil()
-```
+	2. Нам хотелось, чтобы рабочий пайплайн был похож на рабочий пайплайн, а не на простыню всем известного кода, поэтому мы воспользовались библиотекой dataset, благодаря которой наш пайплайн выглядит так:
 
-To load a model from disk we create
+	```python
+	self.find_neighbours_ppl = (Pipeline()
+                                         .load(fmt='image', components='images')
+                                         .to_array()
+                                         .to_cv(src='images')
+                                         .detect_face()
+                                         .crop_from_bbox()
+                                         .resize(IMG_SHAPE, fmt='cv')
+                                         .to_rgb()
+                                         .init_variable('predicted_embeddings', init_on_each_run=0)
+                                         .init_model('static', MyModel, model_name,
+                                                     config={'load' : {'path' : model_path, 'graph': model_name + '.meta', 'checkpoint' : checkpoint_path},  'build': False})
+                                         .predict_model(model_name, fetches="embeddings:0",
+                                                        feed_dict={'input:0' : B('images'), 'phase_train:0' : False},
+                                                        save_to=B('embedding'), mode='w')
+                                         .find_nearest_neighbours(src=index_path, k_neighbours=K_NEIGHBOURS))
+    ```
 
-```python
-init_model_ppl = (Pipeline()
-                    .init_model('static', MyModel, model_name,
-                                config={'load' : {'path' : model_path, 'graph': model_name + '.meta',
-                                                  'checkpoint' : checkpoint_path}, 'build': False}))
-```
+    Хотя в нашем случае пайплайн прост как три копейки, благодаря данному подходу код было очень удобно рефакторить и тестировать.
+    Для предсказания эмбедингов мы использовали предобученный Inception ResNet v1 (facenet).
 
-And to create Index we merge two pipelines above and add predict function from Project/model.py and dump embeddings to the disk:
+    Мы обрезаем входную картинку хааркаскадом из opencv. Для того чтобы сравнивать лица в одном масштабе, мы точно так же обрезали картинки из нашей базы. 
 
-```python
-predict_ppl = ((preprocess_ppl + init_model_ppl)
-                .predict_model(model_name, fetches="embeddings:0",
-                               feed_dict={'input:0' : B('images'), 'phase_train:0' : False},
-                               save_to=B('embedding'), mode='w')
-               .dump(dst='cropped_embeddings.csv', fmt='csv', mode='a', components=['embedding'], header=False)
+    3. Самой приключенческой задачей было развернуть сайт. Мы прошли от заглядывания на красивости фронтэндов до простых, но понятных решений, разрушили ореол загадочности в восприятии людей, поднимающих на постоянной основе докеры и пополнили список клиентов амазона.
 
-```
-
-This pipeline is lazy so we need to ask it to run:
-
-```python
-(predict_ppl << dset).run(BATCH_SIZE, n_epochs=1)
-```
-where dset is an instance of class dataset which supports indexing over current data.
-
-Once we have saved embeddings we are ready to build an AnnoyIndex and save it to the disk:
-```python
-preprocess_ppl = (Pipeline()
-     	.load(src='embeddings.csv', fmt='csv', components='embedding', index_col='file_name', post=load_func)
-       .build_index()
-```
-
-Then when we get new images we do the preproccessing and call a function to search for the neighbours using existing Index:
-
-```python
-my_workflow = (preprocess_ppl.find_nearest_neighbours(src='my_index.ann', k_neighbours=6)
-				<< Dataset(index=FilesIndex(path=image_path)), batch_class=CelebrityBatch))
-```
-
-And the neighbours indices will be saves to the batch's component `neighbours`.
-
-## About our knn method:
-Firstly, we used spotify's [Annoy](https://github.com/spotify/annoy). Then we implemented Locality-sensitive hashing (LSH) algorithm. There are 4 main methods: init, create_splits (creates plane splitting for each hash-table), add_to_table (add embedding and photo index in hash-table) and find_k_neighboors. Also, we implemented saving the constructed index and ability to download it from file.
-
-For wrapping our C++ code and use it in python like this: ```import pylsh``` we used `Cython`.
-
-Also, we implemented brute force solution for finding k neighboors to compare with LSH.
+    Неизвестно, с чем это связано, но мы не раз сталкивались с отсутствием доступа к амазоновскому серверу без vpn. Чтобы иметь возможность поднять за несколько минут все решение на новом инстансе, мы написали Dockerfile и скрипт, скачивающий данные и поднимающий докер.
