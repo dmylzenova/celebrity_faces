@@ -1,155 +1,202 @@
 #include "lsh.h"
+#include <cassert>
+#include <cstring>
+
+LSH::LSH() = default;
 
 
-void write_planes_to_file(std::vector<std::vector<std::vector<double> > > planes, const std::string &path_to_dir) {
-    std::ofstream file;
-    file.open(path_to_dir + "planes.txt");
-    for (size_t line = 0; line < planes.size(); ++line) {
-        for (size_t row = 0; row < planes[0].size(); ++row) {
-            for (size_t col = 0; col < planes[0][0].size(); ++col) {
-                file << planes[line][row][col] << ' ';
-            }
-            file << '\n';
+LSH::LSH(size_t num_hash_tables, size_t num_splits, size_t dimension_size) {
+    assert(num_splits <= 64);
+
+    _num_hash_tables = num_hash_tables;
+    _num_splits = num_splits;
+    _dimension_size = dimension_size;
+
+    _planes.resize(num_hash_tables);
+    for (size_t i = 0; i < num_hash_tables; ++i) {
+        _planes[i].resize(num_splits);
+        for (size_t row = 0; row < num_splits; ++row) {
+            _planes[i][row].resize(dimension_size);
         }
-        file << '\n';
     }
-    file.close();
+    _hash_tables.resize(num_hash_tables);
 }
 
-
-std::vector<std::vector<std::vector<double> > >
-read_planes_from_file(size_t num_hash_tables, size_t num_splits, const std::string &path_to_dir) {
-    std::vector<std::vector<std::vector<double> > > result(num_hash_tables);
-    for (size_t i = 0; i < num_hash_tables; ++i) {
-        result[i].resize(num_splits);
+void LSH::create_splits() {
+    for (size_t num_table = 0; num_table < _num_hash_tables; ++num_table) {
+        this->_planes[num_table] = this->create_splits_for_one_table();
     }
+}
+
+bool LSH::write_planes_to_file(const std::string &path_to_file) {
+    std::ofstream file;
+    file.open(path_to_file);
+    if (file.is_open()) {
+        for (auto &hash_table_planes : _planes) {
+            for (auto &plane : hash_table_planes) {
+                for (double val: plane) {
+                    file << val << ' ';
+                }
+                file << std::endl;
+            }
+            file << std::endl;
+        }
+        file.close();
+        return true;
+    }
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
+    return false;
+}
+
+bool LSH::read_planes_from_file(const std::string &path_to_file) {
     std::string line;
-    std::ifstream file(path_to_dir + "planes.txt");
+    std::ifstream file(path_to_file);
     int split_ind = 0;
     size_t hash_table_num = 0;
-    if (file.is_open()) {
+    if (!file.fail()) {
         while (getline(file, line)) {
             if (line.empty()) {
                 hash_table_num += 1;
                 split_ind = 0;
-                if (hash_table_num == num_hash_tables)
+                if (hash_table_num == _num_hash_tables)
                     break;
             } else {
                 std::istringstream s2(line);
-                double tmp;
-                while (s2 >> tmp) {
-                    result[hash_table_num][split_ind].push_back(tmp);
+                double current_value;
+                size_t id = 0;
+                while (s2 >> current_value) {
+                    _planes[hash_table_num][split_ind][id] = current_value;
                 }
                 split_ind += 1;
             }
         }
         file.close();
+        return true;
     }
-    return result;
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
+    return false;
 }
 
 
-std::unordered_map<std::string, std::vector<embedding_type> > read_map_from_one_file(const std::string &name) {
-    std::ifstream file(name);
-    std::unordered_map<std::string, std::vector<embedding_type> > result;
+void LSH::add_to_table(size_t index, const std::vector<double> &embedding) {
+    for (size_t hash_table_index = 0; hash_table_index < _num_hash_tables; ++hash_table_index) {
+        unsigned long long hash_val = get_hash(embedding, hash_table_index);
+        this->_hash_tables[hash_table_index][hash_val].insert(index);
+    }
+    _img_index_to_embedding.insert({index, embedding});
+}
+
+bool LSH::write_index_embedding_dict(const std::string &path_to_file) {
+    std::ofstream file;
+    file.open(path_to_file);
+    if (file.is_open()) {
+        for (auto &dict_record : _img_index_to_embedding) {
+            file << dict_record.first << " ";
+            for (auto &val: dict_record.second) {
+                file << val << " ";
+            }
+            file << std::endl;
+        }
+        file.close();
+        return true;
+    }
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
+    return false;
+}
+
+bool LSH::read_index_embedding_dict(const std::string &path_to_file) {
+    size_t img_index;
     std::string line;
-    std::string key;
-    bool new_key = true;
+    std::ifstream file(path_to_file);
     if (file.is_open()) {
         while (getline(file, line)) {
-            if (line.empty()) {
-                new_key = true;
-                getline(file, line);
-                getline(file, line);
-            }
-            if (new_key) {
-                key = line;
-                getline(file, line);
-            }
-            if (line.empty()) {
-                break;
-            }
-            std::istringstream s2(line);
-            int index;
-            s2 >> index;
+            std::istringstream linestream(line);
+            linestream >> img_index;
 
-            double tmp;
-            std::vector<double> emb;
-            while (s2 >> tmp) {
-                emb.push_back(tmp);
+            double embedding_val;
+            std::vector<double> embedding;
+            while (linestream >> embedding_val) {
+                embedding.push_back(embedding_val);
             }
-            embedding_type point;
-            point._image_index = index;
-            point._emb = emb;
-            result[key].push_back(point);
-            new_key = false;
+            _img_index_to_embedding.insert(std::make_pair(img_index, embedding));
         }
+        file.close();
+        return true;
     }
-    file.close();
-    return result;
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
+    return false;
 }
 
-
-std::vector<std::unordered_map<std::string, std::vector<embedding_type> > >
-read_map_from_files(size_t num_hash_tables, const std::string &path_to_dir) {
-    std::vector<std::unordered_map<std::string, std::vector<embedding_type> > > answer;
-    for (size_t i = 0; i < num_hash_tables; ++i) {
-        std::string name = path_to_dir + std::to_string(i) + ".txt";
-        answer.push_back(read_map_from_one_file(name));
-    }
-    return answer;
-};
-
-
-LSH::LSH() = default;
-
-
-LSH::LSH(size_t num_hash_tables, size_t num_splits, size_t dimension_size, std::string path_to_dir = "") {
-    _num_hash_tables = num_hash_tables;
-    _num_splits = num_splits;
-    _dimension_size = dimension_size;
-    if (path_to_dir.empty()) {
-        _planes.resize(num_hash_tables);
-        for (size_t i = 0; i < num_hash_tables; ++i) {
-            _planes[i].resize(num_splits);
-            for (size_t row = 0; row < num_splits; ++row) {
-                _planes[i][row].resize(dimension_size);
-            }
-        }
-        _hash_tables.resize(num_hash_tables);
-
-    } else {
-        _planes = read_planes_from_file(num_hash_tables, num_splits, path_to_dir);
-        _hash_tables = read_map_from_files(num_hash_tables, path_to_dir);
-    }
+bool LSH::fill_data_from_files(const std::string &planes_path, const std::string &hash_tables_dir_path,
+                               const std::string &index_embedding_dict_path) {
+    return this->read_planes_from_file(planes_path)
+           && this->read_hash_tables_from_files(hash_tables_dir_path)
+           && read_index_embedding_dict(index_embedding_dict_path);
 }
 
-void LSH::write_map_to_file(std::string path_to_dir) {
+bool LSH::write_hash_tables_to_files(const std::string &path_to_dir) {
     size_t num_hash_tables = this->_hash_tables.size();
     for (size_t i = 0; i < num_hash_tables; ++i) {
         std::string name = path_to_dir + std::to_string(i) + ".txt";
         std::ofstream file;
         file.open(name);
-        auto it = this->_hash_tables[i].begin();
-        while (it != this->_hash_tables[i].end()) {
-            file << it->first;
-            file << "\n";
-            for (auto &item : it->second) {
-                file << item._image_index << " ";
-                for (double &el : item._emb) {
-                    file << el << " ";
+        if (file.is_open()) {
+            for (auto &hash_img_ids: this->_hash_tables[i]) {
+                file << hash_img_ids.first << " ";
+                for (size_t img_index: hash_img_ids.second) {
+                    file << img_index << " ";
                 }
-                file << "\n";
+                file << std::endl;
             }
-            file << "\n\n";
-            it++;
+            file.close();
+        } else {
+            std::cerr << "Error: " << std::strerror(errno) << std::endl;
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LSH::read_hash_table_from_file(std::unordered_map<unsigned long long, std::set<size_t> > *result,
+                                    const std::string &file_name) {
+    std::string line;
+    unsigned long long lsh_hash = 0;
+
+    std::ifstream file(file_name);
+    if (file.is_open()) {
+        while (getline(file, line)) {
+            std::istringstream linestream(line);
+            linestream >> lsh_hash;
+
+            size_t cur_img_index;
+            std::set<size_t> img_ids;
+            while (linestream >> cur_img_index) {
+                img_ids.insert(cur_img_index);
+            }
+
+            result->insert(std::make_pair(lsh_hash, img_ids));
         }
         file.close();
+        return true;
     }
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
+    return false;
 }
+
+bool LSH::read_hash_tables_from_files(const std::string &path_to_dir) {
+    for (size_t i = 0; i < _num_hash_tables; ++i) {
+        std::string name = path_to_dir + std::to_string(i) + ".txt";
+        if (!LSH::read_hash_table_from_file(&_hash_tables[i], name)) {
+            std::cerr << "Error: " << std::strerror(errno) << std::endl;
+            return false;
+        }
+    };
+    return true;
+};
 
 
 double LSH::dot(const std::vector<double> &x, const std::vector<double> &y) {
+    assert (x.size() == y.size());
     double sum = 0;
     for (std::size_t i = 0; i < x.size(); ++i) {
         sum += x[i] * y[i];
@@ -171,7 +218,6 @@ std::vector<double> LSH::normalize(std::vector<double> &v) {
 
 std::vector<double> LSH::multiply(std::vector<std::vector<double> > &matrix, std::vector<double> &v) {
     std::vector<double> result;
-    result.reserve(_num_splits);
     for (std::size_t row = 0; row < matrix.size(); ++row) {
         double sum = 0;
         for (std::size_t el = 0; el < matrix[0].size(); ++el) {
@@ -206,82 +252,30 @@ std::vector<std::vector<double> > LSH::create_splits_for_one_table() {
 }
 
 
-void LSH::create_splits(const std::string &path_to_dir) {
-    for (size_t num_table = 0; num_table < _num_hash_tables; ++num_table) {
-        this->_planes[num_table] = this->create_splits_for_one_table();
-    }
-    write_planes_to_file(_planes, path_to_dir);
-}
-
-
-std::string LSH::get_hash(std::vector<double> point, size_t hash_table_index) {
-    std::string hash_value;
-    hash_value.resize(_num_splits);
+unsigned long long LSH::get_hash(std::vector<double> point, size_t hash_table_index) {
+    std::bitset<64> hash_value;
     std::vector<double> values = multiply(_planes[hash_table_index], point);
     for (size_t indx = 0; indx < _num_splits; ++indx) {
-        if (values[indx] > 0) {
-            hash_value[indx] = '1';
-
-        } else {
-            hash_value[indx] = '0';
-        }
+        hash_value[indx] = values[indx] > 0;
     }
-    return hash_value;
+    return hash_value.to_ullong();
 }
 
 
-std::vector<int> LSH::dummy_k_neighboors(size_t k, std::vector<int> indexes, std::vector<std::vector<double> > embeddings,
-                                         std::vector<double> given_point) {
-    std::vector<int> answer;
-    std::vector<embedding_type> points;
-    for (std::size_t i = 0; i < indexes.size(); ++i) {
-        points.push_back({indexes[i], embeddings[i]});
+std::vector<int> LSH::dummy_k_neighbors(size_t k, std::vector<int> indexes,
+                                        std::vector<std::vector<double> > embeddings,
+                                        std::vector<double> given_point) {
+    std::set<size_t> answer;
 
+    std::vector<std::pair<size_t, double> > candidates;
+    for (size_t i = 0; i < indexes.size(); ++i) {
+        double curr_distance = calculate_distance(embeddings[i], given_point);
+        candidates.emplace_back(std::make_pair(indexes[i], curr_distance));
     }
-    std::vector<std::pair<int, double> > candidates;
-    for (auto &point : points) {
-        double curr_distance = calculate_distance(point._emb, given_point);
-        candidates.emplace_back(std::make_pair(point._image_index, curr_distance));
-    }
+
     std::sort(candidates.begin(), candidates.end(), sortbysecond());
-    answer.push_back(candidates[0].first);
-    for (size_t i = 1; i < k; ++i) {
-        if (answer[i - 1] != candidates[i].first) {
-            answer.push_back(candidates[i].first);
-        }
-    }
-    return answer;
-}
-
-
-void LSH::add_to_table(int index, std::vector<double> embedding) {
-    embedding_type point;
-    point._image_index = index;
-    point._emb = std::move(embedding);
-    for (size_t i = 0; i < _num_hash_tables; ++i) {
-        std::string hash_val = get_hash(point._emb, i);
-        this->_hash_tables[i][hash_val].push_back(point);
-    }
-}
-
-
-std::vector<int> LSH::find_k_neighboors(size_t k, std::vector<double> embedding) {
-    std::set<int> answer;
-    std::vector<std::pair<int, double> > candidates;
-    for (size_t i = 0; i < _num_hash_tables; ++i) {
-        std::string hash_value = get_hash(embedding, i);
-        std::vector<embedding_type> result_points = _hash_tables[i][hash_value];
-        for (auto &result_point : result_points) {
-            candidates.emplace_back(std::make_pair(result_point._image_index,
-                                                   calculate_distance(result_point._emb, embedding)));
-        }
-    }
-    std::sort(candidates.begin(), candidates.end(), sortbysecond());
-    if (candidates.empty()) {
-        return {};
-    }
-    for (size_t i = 1; i < candidates.size(); ++i) {
-        answer.insert(candidates[i].first);
+    for (auto &candidate : candidates) {
+        answer.insert(candidate.first);
         if (answer.size() == k) {
             break;
         }
@@ -290,3 +284,32 @@ std::vector<int> LSH::find_k_neighboors(size_t k, std::vector<double> embedding)
     return result;
 }
 
+
+std::vector<int> LSH::find_k_neighbors(size_t k, std::vector<double> embedding) {
+    std::set<size_t> answer;
+    std::map<size_t , double> candidates;
+    for (size_t hash_table_index = 0; hash_table_index < _num_hash_tables; ++hash_table_index) {
+        unsigned long long hash_value = get_hash(embedding, hash_table_index);
+        std::set<size_t > img_ids = _hash_tables[hash_table_index][hash_value];
+        for (auto &cur_img_id : img_ids) {
+            auto &candidate_img_embedding = _img_index_to_embedding.at(cur_img_id);
+            if (candidates.find(cur_img_id) == candidates.end()) {
+                candidates.insert(std::make_pair(cur_img_id, calculate_distance(candidate_img_embedding, embedding)));
+            }
+        }
+    }
+    if (candidates.empty()) {
+        return {};
+    }
+    std::vector<std::pair<size_t, double> > candidates_list(candidates.begin(), candidates.end());
+    std::sort(candidates_list.begin(), candidates_list.end(), sortbysecond());
+
+    for (size_t i = 1; i < candidates_list.size(); ++i) {
+        answer.insert(candidates_list[i].first);
+        if (answer.size() == k) {
+            break;
+        }
+    }
+    std::vector<int> result(answer.begin(), answer.end());
+    return result;
+}
