@@ -8,7 +8,7 @@ else
     cd $HOME/celebrity_faces && git pull
 fi
 sudo pip3 install --upgrade pip
-sudo pip3 install -r celebrity_faces/requirements.txt
+sudo pip3 install -r $HOME/celebrity_faces/requirements.txt
 cd $HOME/celebrity_faces/index && sudo python3 setup.py build_ext --inplace && cp pylsh*.so $HOME/celebrity_faces/viewer
 
 # Upload data
