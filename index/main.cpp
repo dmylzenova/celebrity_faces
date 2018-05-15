@@ -30,11 +30,17 @@ int main() {
     assert (lsh.write_hash_tables_to_files("./"));
     assert (lsh.write_index_embedding_dict("./index_embedding.txt"));
 
+    std::vector<int> top2 = lsh.find_k_neighbors(2, e);
+    assert (!top2.empty());
+
 
     // find neighbors
     LSH lsh1(2, 4, 13);
     assert (lsh1.fill_data_from_files("./planes.txt", "./", "./index_embedding.txt"));
-    std::vector<int> answer = lsh1.find_k_neighbors(2, e);
+    std::vector<int> top2_2 = lsh1.find_k_neighbors(2, e);
+    assert (!top2_2.empty());
+
+    assert(top2 == top2_2);
 
     // dummy k_neighbors
 

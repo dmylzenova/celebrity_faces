@@ -50,24 +50,23 @@ bool LSH::write_planes_to_file(const std::string &path_to_file) {
 
 bool LSH::read_planes_from_file(const std::string &path_to_file) {
     std::string line;
-    std::ifstream file(path_to_file);
-    int split_ind = 0;
+    int split_index = 0;
     size_t hash_table_num = 0;
-    if (!file.fail()) {
+    std::ifstream file(path_to_file);
+    if (file.is_open()) {
         while (getline(file, line)) {
             if (line.empty()) {
                 hash_table_num += 1;
-                split_ind = 0;
-                if (hash_table_num == _num_hash_tables)
-                    break;
+                split_index = 0;
             } else {
-                std::istringstream s2(line);
+                std::istringstream linestream(line);
                 double current_value;
                 size_t id = 0;
-                while (s2 >> current_value) {
-                    _planes[hash_table_num][split_ind][id] = current_value;
+                while (linestream >> current_value) {
+                    _planes[hash_table_num][split_index][id] = current_value;
+                    id += 1;
                 }
-                split_ind += 1;
+                split_index += 1;
             }
         }
         file.close();
