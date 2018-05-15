@@ -28,7 +28,7 @@ if [ ! -f index.zip ]; then
 fi
 
 if [ ! -f cropped_photos.zip ]; then
-    wget 'https://downloader.disk.yandex.ru/disk/3f47ab4e9a7a6c1a07a6d4133fe6fc250a1e3affdc7ae1c7ae678cdd690437ca/5afb3b6b/ddZ6cPttF3My8iD24FAVMGih0Y48jpk0L8HqWhH8T8uJd3oy42om7dvGdDthoDm11gjlbipE8-KemsJlt_0WsA==?uid=0&filename=model.zip&disposition=attachment&hash=g1kEsVlquYHXVsRHYxcZqBD6M/zUVQn++VPQwis107Y=&limit=0&content_type=application/x-zip-compressed&fsize=192225146&hid=3194ee851e6f825d5717ee58e886c511&media_type=compressed&tknv=v2' \
+    wget 'https://downloader.disk.yandex.ru/disk/874bd934171243b0f21574c07f25d581777eceeac5dfbf2ae29fbe2bf92e7d91/5afb3b52/ddZ6cPttF3My8iD24FAVMNMVwbHXYPOtYUfz0SZYfxH4mFRft67jMJo_GH5EjeEpmnhqvnutlhOthPxqre2UjA%3D%3D?uid=0&filename=cropped_photos.zip&disposition=attachment&hash=feWHaLxtk1%2B8dmL0kDELoAtGd9yXP8yu5rSTpmx4ucM%3D&limit=0&content_type=application%2Fx-zip-compressed&fsize=743778718&hid=43983205d7b1bae83ea31cf278897abd&media_type=compressed&tknv=v2' \
         -O cropped_photos.zip
     unzip cropped_photos.zip
 fi
