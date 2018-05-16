@@ -7,4 +7,4 @@ from app import photos
 
 class InitForm(FlaskForm):
     photo = FileField("photo", validators=[FileRequired(), FileAllowed(photos, 'Images only!')])
-    show_dummy_knn = BooleanField("show_dummy_knn", default=False)
+    show_dummy_knn = BooleanField("show_dummy_knn", default=True)
