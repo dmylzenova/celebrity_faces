@@ -86,6 +86,8 @@ class MtController:
 
         result = dict(dst=dst, knn=knn_files)
         if return_dummy:
-            result['dummy_knn'] = self.index.dummy_k_neighbors(images_count, self.file_indices, \
-                                                               self.saved_embeddings, batch.embedding[0])
+            dummy_knn = self.index.dummy_k_neighbors(images_count, self.file_indices,
+                                                     self.saved_embeddings, batch.embedding[0])
+            dummy_knn_files = [str(current) + '.jpg' for current in dummy_knn]
+            result['dummy_knn'] = dummy_knn_files
         return result

@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
     <h1>Celebrity faces</h1>
-    Загрузи свою фотографию и узнай, на какую знаменитость ты похож. <br>
+    <h3>Загрузи свою фотографию и узнай, на какую знаменитость ты похож. </h3>
+    <br>
     <form method=POST enctype=multipart/form-data action="{{ url_for('index') }}">
-        <input type=file name=photo>
-        <input type="submit">
+        {{ form.hidden_tag() }}
+        <b>Показать результат полного перебора</b> {{ form.show_dummy_knn() }} <br>
+        Это может занять некоторое время. <br>
+        <br>
+        {{ form.photo() }} <input type=submit>
     </form>
 
 {% endblock %}

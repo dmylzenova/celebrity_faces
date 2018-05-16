@@ -1,6 +1,7 @@
 Cython==0.28.2
 Flask==1.0.2
 Flask-Uploads==0.2.1
+Flask-WTF==0.14.2
 ipython==6.3.1
 opencv-python==3.4.0.12
 tensorflow==1.8.0

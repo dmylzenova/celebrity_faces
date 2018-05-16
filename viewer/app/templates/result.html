@@ -5,12 +5,21 @@
     <img src="/static/uploaded_img/{{ init_photo }}" width="200"> <br>
     Посмотрим поближе:<br>
     <img src="/static/uploaded_img/{{ cropped_photo }}" width="200"> <br>
-    Знаменитости, на которых ты похож: <br>
+    Знаменитости, на которых ты похож (LSH): <br>
     <img src="/static/cropped_photos/{{ celebrity_photos[0] }}" width="200"><br>
     {% for photo in celebrity_photos[1:] %}
         <img src="/static/cropped_photos/{{ photo }}" width="100">
     {% endfor %}
     <br>
     <br>
+    {% if accurate_celebrity_photos %}
+        Знаменитости, на которых ты похож (полный перебор): <br>
+        <img src="/static/cropped_photos/{{ accurate_celebrity_photos[0] }}" width="200"><br>
+        {% for photo in accurate_celebrity_photos[1:] %}
+            <img src="/static/cropped_photos/{{ photo }}" width="100">
+        {% endfor %}
+    <br>
+
+    {% endif %}
 
 {% endblock %}
