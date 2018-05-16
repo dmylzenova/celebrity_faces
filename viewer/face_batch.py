@@ -15,7 +15,7 @@ class CelebrityBatch(ImagesBatch):
 
        
     @action
-    @inbatch_parallel(init='indices', post='_assemble', target='for',                       components='dummy_neighbours')
+    @inbatch_parallel(init='indices', post='_assemble', target='for', components='dummy_neighbours')
     def load_dummy_neighbours(self, ix, src='dummy_neighbours.scv', k_neighbours=6):
         all_dummy = json.load(open(src, 'r'))
         return all_dummy[ix][:k_neighbours]
@@ -95,16 +95,15 @@ class CelebrityBatch(ImagesBatch):
             print('FACE CASCADE ERROR ', e, 'image.shape is',  image.shape, 'gray shape is', gray.shape)
             return [0, 0, image.shape[1], image.shape[0]]
         if len(faces) > 1:
-            print('detect_face has found more than one face')
+            return [0, 0, image.shape[1], image.shape[0]]
         try:
             return faces[0]
         except Exception as e:
-            print('haarcascade couldn\'t detect face on your photo' , faces)
             return [0, 0, image.shape[1], image.shape[0]]
 
     @action
     @inbatch_parallel(init='indices', post='_assemble', target='for', components='images')
-    def crop_from_bbox(self, ix, src='images', dst='images', to_rgb=False, component_coord='coordinates'):
+    def crop_from_bbox(self, ix, margin=0.1, top_margin=2, src='images', dst='images', to_rgb=False, component_coord='coordinates'):
         """Crop area from an image using ``coordinates`` attribute
         Parameters
         ----------
@@ -114,6 +113,10 @@ class CelebrityBatch(ImagesBatch):
             the name of the component where the result will be recorded
         component_coord : str
             the name of the component with coordinates of the display with digits
+        margin : float in  [0, 1]
+            fraction of the face size to enlarge opencv bbox via each direction
+        top_margin : float
+            multiplier to enlarge margin on top of the face (to include hair, etc.)
         Returns
         -------
         self
@@ -123,11 +126,20 @@ class CelebrityBatch(ImagesBatch):
             x, y, width, height = self.get(ix, component_coord)
         except Exception as e:
             print(e, self.get(ix, component_coord))
-        dst_data = image[y:y+height, x:x+width]
+        w_margin = int(width * margin)
+        h_margin = int(height * margin)
+        
+        left_y = max(0, y - h_margin * top_margin)
+        right_y = min(image.shape[0], y + height + h_margin)
+        
+        left_x = max(0, x - w_margin)
+        right_x = min(image.shape[1], x + width + w_margin)
+        
+        dst_data = image[left_y:right_y, left_x:right_x]
         if to_rgb:
             dst_data = dst_data[:, :, ::-1]
-        return dst_data
-
+        return dst_data    
+    
     @action
     @inbatch_parallel(init='images', target='for', post='_assemble', components='images')
     def to_rgb(self, image):
