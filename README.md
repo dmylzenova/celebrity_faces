@@ -1,6 +1,6 @@
 # celebrity_faces
 
-![alt text](http://url/to/img.png)https://www.meme-arsenal.com/memes/7200565e5919d7525d4401da11655f05.jpg)
+![.](https://www.meme-arsenal.com/memes/7200565e5919d7525d4401da11655f05.jpg)
 
 При реализации нашего проекта мы прошли через 3 этапа:
 
