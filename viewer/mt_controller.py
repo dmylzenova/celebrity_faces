@@ -17,7 +17,7 @@ class MtController:
                  cropped_photos_dir=os.path.dirname(__file__) + '/app/static/cropped_photos',
                  index_path=os.path.dirname(__file__) + '/app/static/index/',
                  haarcascade_xml_path=os.path.dirname(__file__) + '/app/static/haarcascade_frontalface_default.xml',
-                 pylsh_params=(50, 64, 128)):
+                 pylsh_params=(50, 10, 128)):
                
         self.cropped_photos_dir = cropped_photos_dir
         
