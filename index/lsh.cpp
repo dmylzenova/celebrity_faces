@@ -23,7 +23,7 @@ LSH::LSH(size_t num_hash_tables, size_t num_splits, size_t dimension_size) {
     _hash_tables.resize(num_hash_tables);
 }
 
-void LSH::create_splits() {
+void LSH::create_splits(std::vector<std::vector<double> > point) {
     for (size_t num_table = 0; num_table < _num_hash_tables; ++num_table) {
         this->_planes[num_table] = this->create_splits_for_one_table();
     }
@@ -248,19 +248,38 @@ double LSH::calculate_euclidean_distance(const std::vector<double> &v_first, con
 }
 
 
-std::vector<std::vector<double> > LSH::create_splits_for_one_table() {
-    std::normal_distribution<float> distribution(0.0, 1.0);
-    std::vector<std::vector<double> > planes;
-    for (size_t i = 0; i < _num_splits; ++i) {
-        std::vector<double> current_vector;
-        for (size_t j = 0; j < _dimension_size; ++j) {
-            double current_push = distribution(_generator);
-            current_vector.push_back(current_push);
+// std::vector<std::vector<double> > LSH::create_splits_for_one_table() {
+//     std::normal_distribution<float> distribution(0.0, 1.0);
+//     std::vector<std::vector<double> > planes;
+//     for (size_t i = 0; i < _num_splits; ++i) {
+//         std::vector<double> current_vector;
+//         for (size_t j = 0; j < _dimension_size; ++j) {
+//             double current_push = distribution(_generator);
+//             current_vector.push_back(current_push);
+//         }
+//         planes.push_back(current_vector);
+//     }
+//     return planes;
+// }
+
+
+    std::vector<std::vector<double> > create_splits_for_one_table(std::vector<std::vector<double> > points) {
+        std::uniform_int_distribution<int64_t> distrib(0, points.size()); 
+        std::vector<std::vector<double> > plane(_num_splits);
+        for (int i = 0; i < _num_splits; ++i) {
+            plane[i].resize(_dimension_size);
         }
-        planes.push_back(current_vector);
+        for (int cur_split = 0; cur_split < _num_splits; ++cur_split) {
+            std::size_t first_rand_ind = distrib(_generator);
+            std::size_t sec_rand_ind = distrib(_generator);
+            for (int i = 0; i < _dimension_size; ++i) {
+                plane[cur_split][i] = points[sec_rand_ind][i] - points[first_rand_ind][i];
+            }
+            plane[cur_split] = normalize(plane[cur_split]);
+        }
+        return plane;
     }
-    return planes;
-}
+
 
 
 unsigned long long LSH::get_hash(std::vector<double> point, size_t hash_table_index) {

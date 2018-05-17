@@ -18,7 +18,7 @@ cdef extern from "lsh.h":
         bool write_hash_tables_to_files(string)
         bool write_planes_to_file(string)
         bool write_index_embedding_dict(string)
-        void create_splits()
+        void create_splits(cpp_vec_vec_double)
         void add_to_table(int, cpp_vector_double)
         cpp_vector_int find_k_neighbors(size_t, cpp_vector_double)
         cpp_vector_int dummy_k_neighbors(size_t, cpp_vector_int, cpp_vec_vec_double, cpp_vector_double, bool)
@@ -39,8 +39,8 @@ cdef class PyLSH:
         return self.thisptr.write_index_embedding_dict(path_to_file)
     def write_planes_to_file(self, path_to_file):
             return self.thisptr.write_planes_to_file(path_to_file)
-    def create_splits(self):
-        return self.thisptr.create_splits()
+    def create_splits(self, embeddings):
+        return self.thisptr.create_splits(embeddings)
     def add_to_table(self, index, embedding):
         return self.thisptr.add_to_table(index, embedding)
     def find_k_neighbors(self, k, point):

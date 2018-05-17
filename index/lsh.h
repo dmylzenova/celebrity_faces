@@ -20,7 +20,7 @@ public:
     LSH();
     LSH(size_t num_hash_tables, size_t num_splits, size_t dimension_size);
 
-    void create_splits();
+    void create_splits(const std::vector<std::vector<double> > &embedding);
     bool write_planes_to_file(const std::string &path_to_file);
     bool read_planes_from_file(const std::string &path_to_file);
 
