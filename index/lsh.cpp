@@ -25,7 +25,7 @@ LSH::LSH(size_t num_hash_tables, size_t num_splits, size_t dimension_size) {
 
 void LSH::create_splits(std::vector<std::vector<double> > point) {
     for (size_t num_table = 0; num_table < _num_hash_tables; ++num_table) {
-        this->_planes[num_table] = this->create_splits_for_one_table();
+        this->_planes[num_table] = this->create_splits_for_one_table(point);
     }
 }
 
@@ -266,10 +266,10 @@ double LSH::calculate_euclidean_distance(const std::vector<double> &v_first, con
     std::vector<std::vector<double> > LSH::create_splits_for_one_table(std::vector<std::vector<double> > points) {
         std::uniform_int_distribution<int64_t> distrib(0, points.size()); 
         std::vector<std::vector<double> > plane(_num_splits);
-        for (int i = 0; i < _num_splits; ++i) {
+        for (size_t i = 0; i < _num_splits; ++i) {
             plane[i].resize(_dimension_size);
         }
-        for (int cur_split = 0; cur_split < _num_splits; ++cur_split) {
+        for (size_t cur_split = 0; cur_split < _num_splits; ++cur_split) {
             std::size_t first_rand_ind = distrib(_generator);
             std::size_t sec_rand_ind = distrib(_generator);
             for (int i = 0; i < _dimension_size; ++i) {

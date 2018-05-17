@@ -20,7 +20,7 @@ public:
     LSH();
     LSH(size_t num_hash_tables, size_t num_splits, size_t dimension_size);
 
-    void create_splits(const std::vector<std::vector<double> > &embedding);
+    void create_splits(const std::vector<std::vector<double> > embeddings);
     bool write_planes_to_file(const std::string &path_to_file);
     bool read_planes_from_file(const std::string &path_to_file);
 
@@ -33,7 +33,7 @@ public:
                               const std::string &index_embedding_dict_path);
     bool read_hash_tables_from_files(const std::string &path_to_dir);
 
-    std::vector<std::vector<double> > create_splits_for_one_table(const std::vector<std::vector<double> > &embedding);
+    std::vector<std::vector<double> > create_splits_for_one_table(const std::vector<std::vector<double> > embeddings);
 
     unsigned long long get_hash(std::vector<double> point, size_t hash_table_index);
 
