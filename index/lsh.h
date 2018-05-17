@@ -33,7 +33,7 @@ public:
                               const std::string &index_embedding_dict_path);
     bool read_hash_tables_from_files(const std::string &path_to_dir);
 
-    std::vector<std::vector<double> > create_splits_for_one_table();
+    std::vector<std::vector<double> > create_splits_for_one_table(const std::vector<std::vector<double> > &embedding);
 
     unsigned long long get_hash(std::vector<double> point, size_t hash_table_index);
 
