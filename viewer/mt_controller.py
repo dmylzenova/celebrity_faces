@@ -47,6 +47,7 @@ class MtController:
                                          .crop_from_bbox(margin=0.2, top_margin=2)
                                          .resize(img_shape, fmt='cv')
                                          .to_rgb()
+                                         .multiply(1/255.)
                                          .init_variable('predicted_embeddings', init_on_each_run=0)
                                          .init_variable('indices', init_on_each_run=0)
                                          .init_model('static', model.MyModel, model_name,
