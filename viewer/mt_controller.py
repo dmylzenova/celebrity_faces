@@ -88,5 +88,5 @@ class MtController:
         if return_dummy:
             dummy_knn = self.index.dummy_k_neighbors(images_count, self.file_indices, \
                                                      self.saved_embeddings, batch.embedding[0])
-            result['dummy_knn'] = [('00000' + item)[-10:] for item in dummy_knn]
+            result['dummy_knn'] = [('00000' + str(current) + '.jpg')[-6:] for current in dummy_knn]
         return result
