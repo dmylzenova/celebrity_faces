@@ -23,7 +23,7 @@ def index():
 
 @app.route('/result/<filename>')
 def result(filename):
-    show_dummy_knn = flask.request.args.get('show_dummy_knn', False)
+    show_dummy_knn = flask.request.args.get('show_dummy_knn') == "True"
 
     init_photo_abs_dir = os.path.dirname(__file__) + "/static/uploaded_img/"
     if not os.path.isfile(init_photo_abs_dir + filename):
