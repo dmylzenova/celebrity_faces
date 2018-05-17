@@ -82,11 +82,11 @@ class MtController:
         imageio.imsave(dir_path + dst, batch.images[0])
         print('saved cropped image to ', dst)
 
-        knn_files = [('00000' + str(current) + '.jpg')[-6:] for current in batch.neighbours[0][:images_count]]
+        knn_files = [('00000' + str(current))[-6:] + '.jpg' for current in batch.neighbours[0][:images_count]]
 
         result = dict(dst=dst, knn=knn_files)
         if return_dummy:
             dummy_knn = self.index.dummy_k_neighbors(images_count, self.file_indices, \
                                                      self.saved_embeddings, batch.embedding[0])
-            result['dummy_knn'] = [('00000' + str(current) + '.jpg')[-6:] for current in dummy_knn]
+            result['dummy_knn'] = [('00000' + str(current))[-6:] + '.jpg' for current in dummy_knn]
         return result
