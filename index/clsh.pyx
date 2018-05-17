@@ -21,9 +21,10 @@ cdef extern from "lsh.h":
         void create_splits()
         void add_to_table(int, cpp_vector_double)
         cpp_vector_int find_k_neighbors(size_t, cpp_vector_double)
-        cpp_vector_int dummy_k_neighbors(size_t, cpp_vector_int, cpp_vec_vec_double, cpp_vector_double)
+        cpp_vector_int dummy_k_neighbors(size_t, cpp_vector_int, cpp_vec_vec_double, cpp_vector_double, bool)
         unsigned long long get_hash(cpp_vector_double, size_t)
         double calculate_distance(cpp_vector_double&, cpp_vector_double&)
+        double calculate_euclidean_distance(cpp_vector_double&, cpp_vector_double&)
 
 
 cdef class PyLSH:
@@ -44,9 +45,11 @@ cdef class PyLSH:
         return self.thisptr.add_to_table(index, embedding)
     def find_k_neighbors(self, k, point):
         return self.thisptr.find_k_neighbors(k, point)
-    def dummy_k_neighbors(self, k, indexes, embeddings, given_point):
-        return self.thisptr.dummy_k_neighbors(k, indexes, embeddings, given_point)
+    def dummy_k_neighbors(self, k, indexes, embeddings, given_point, use_euclidean=True):
+        return self.thisptr.dummy_k_neighbors(k, indexes, embeddings, given_point, use_euclidean)
     def get_hash(self, point, hash_table_index):
         return self.thisptr.get_hash(point, hash_table_index)
     def calculate_distance(self, v_first, v_sec):
         return self.thisptr.calculate_distance(v_first, v_sec)
+    def calculate_euclidean_distance(self, v_first, v_sec):
+        return self.thisptr.calculate_euclidean_distance(v_first, v_sec)

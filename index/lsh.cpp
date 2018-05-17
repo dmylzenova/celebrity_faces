@@ -1,6 +1,7 @@
 #include "lsh.h"
 #include <cassert>
 #include <cstring>
+#include <functional>
 
 LSH::LSH() = default;
 
@@ -228,11 +229,22 @@ std::vector<double> LSH::multiply(std::vector<std::vector<double> > &matrix, std
 }
 
 
-double LSH::calculate_distance(std::vector<double> &v_first, std::vector<double> &v_sec) {
+double LSH::calculate_distance(const std::vector<double> &v_first, const std::vector<double> &v_sec) {
     double distance = 0;
     double similarity = dot(v_first, v_sec) / sqrt(dot(v_first, v_first) * dot(v_sec, v_sec));
     distance = 1 - similarity;
     return distance;
+}
+
+
+double LSH::calculate_euclidean_distance(const std::vector<double> &v_first, const std::vector<double> &v_sec) {
+    assert(v_first.size() == v_sec.size());
+    double sum = 0;
+    for (size_t i=0; i < v_first.size(); ++i) {
+        double delta = v_first[i] - v_sec[i];
+        sum += delta * delta;
+    }
+    return sum > 0. ? sqrt(sum) : 0.;
 }
 
 
@@ -261,14 +273,18 @@ unsigned long long LSH::get_hash(std::vector<double> point, size_t hash_table_in
 }
 
 
-std::vector<int> LSH::dummy_k_neighbors(size_t k, std::vector<int> indexes,
-                                        std::vector<std::vector<double> > embeddings,
-                                        std::vector<double> given_point) {
+std::vector<int> LSH::dummy_k_neighbors(size_t k, const std::vector<int> indexes,
+                                        const std::vector<std::vector<double> > embeddings,
+                                        const std::vector<double> given_point,
+                                        bool use_euclidean) {
+    std::function<double(const std::vector<double> &, const std::vector<double> &)> distance_func =
+            use_euclidean ? &LSH::calculate_euclidean_distance : &LSH::calculate_distance;
+
     std::vector<int> answer;
 
     std::vector<std::pair<size_t, double> > candidates;
     for (size_t i = 0; i < indexes.size(); ++i) {
-        double curr_distance = calculate_distance(embeddings[i], given_point);
+        double curr_distance = distance_func(embeddings[i], given_point);
         candidates.emplace_back(std::make_pair(indexes[i], curr_distance));
     }
 
@@ -283,7 +299,7 @@ std::vector<int> LSH::dummy_k_neighbors(size_t k, std::vector<int> indexes,
 }
 
 
-std::vector<int> LSH::find_k_neighbors(size_t k, std::vector<double> embedding) {
+std::vector<int> LSH::find_k_neighbors(size_t k, const std::vector<double> embedding) {
     std::vector<int> answer;
     std::map<size_t , double> candidates;
     for (size_t hash_table_index = 0; hash_table_index < _num_hash_tables; ++hash_table_index) {

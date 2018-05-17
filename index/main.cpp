@@ -57,6 +57,7 @@ int main() {
     embeddings.push_back(d);
 
     std::vector<int> answer1 = lsh.dummy_k_neighbors(2, indexes, embeddings, e);
+    std::vector<int> answer2 = lsh.dummy_k_neighbors(2, indexes, embeddings, e, true);
 
     // test asser
 //    LSH lsh2(2, 65, 13);
