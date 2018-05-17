@@ -21,7 +21,7 @@ class CelebrityBatch(ImagesBatch):
         return all_dummy[ix][:k_neighbours]
     
     @action
-    def build_index(self, pyindex, use_pylsh=True, pylsh_params=(5, 20, 128), dst_path='./index_data/', n_trees=10):
+    def build_index(self, use_pylsh=True, pylsh_params=(5, 20, 128), dst_path='./index_data/', n_trees=10):
         """
         Builds and saves AnnoyIndex
 
@@ -35,6 +35,7 @@ class CelebrityBatch(ImagesBatch):
             number of trees used in AnnoyIndex
         """
         if use_pylsh:
+            pyindex = pylsh.PyLSH(*params)
             pyindex.create_splits()
             for ix in self.indices:
                 current_embd = self.get(ix, 'embedding')
@@ -51,14 +52,14 @@ class CelebrityBatch(ImagesBatch):
             for ix in range(n_items):
                 index.add_item(ix, self.get(self.indices[ix], 'embedding'))
             index.build(n_trees)
-            index.save(dst + 'annoy.ann')
+            index.save(dst_path + 'annoy.ann')
             self.int_indices = list(range(n_items))
-            print('saved Index to ', dst)
+            print('saved Index to ', dst_path)
         return self
 
     @action
     @inbatch_parallel(init='indices', post='_assemble', target='for', components='neighbours')
-    def find_nearest_neighbours(self, ix, pyindex, use_pylsh=True, pylsh_params=(5, 2000, 128), src='my_index.ann', 
+    def find_nearest_neighbours(self, ix, pyindex='', use_pylsh=True, pylsh_params=(5, 2000, 128), src='my_index.ann', 
                                 use_preloaded=True, k_neighbours=6):
         """
         Finds k approximate nearest neighbours using

@@ -44,7 +44,7 @@ class MtController:
                                          .to_array()
                                          .to_cv(src='images')
                                          .detect_face(haarcascade_xml_path)
-                                         .crop_from_bbox()
+                                         .crop_from_bbox(margin=0.2, top_margin=2)
                                          .resize(img_shape, fmt='cv')
                                          .to_rgb()
                                          .init_variable('predicted_embeddings', init_on_each_run=0)
@@ -55,7 +55,7 @@ class MtController:
                                          .predict_model(model_name, fetches="embeddings:0",
                                                         feed_dict={'input:0': B('images'), 'phase_train:0': False},
                                                         save_to=B('embedding'), mode='w')
-                                         .find_nearest_neighbours(self.index, k_neighbours=k_neighbours, use_pylsh=True)
+                                         .find_nearest_neighbours(pyindex=self.index, k_neighbours=k_neighbours, use_pylsh=True)
                                    )
 
         print('Ready!')
@@ -86,8 +86,6 @@ class MtController:
 
         result = dict(dst=dst, knn=knn_files)
         if return_dummy:
-            dummy_knn = self.index.dummy_k_neighbors(images_count, self.file_indices,
-                                                     self.saved_embeddings, batch.embedding[0])
-            dummy_knn_files = [str(current) + '.jpg' for current in dummy_knn]
-            result['dummy_knn'] = dummy_knn_files
+            result['dummy_knn'] = self.index.dummy_k_neighbors(images_count, self.file_indices, \
+                                                               self.saved_embeddings, batch.embedding[0])
         return result
