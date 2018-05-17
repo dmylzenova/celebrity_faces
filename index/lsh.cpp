@@ -248,21 +248,6 @@ double LSH::calculate_euclidean_distance(const std::vector<double> &v_first, con
 }
 
 
-// std::vector<std::vector<double> > LSH::create_splits_for_one_table(std::vector<std::vector<double> > points) {
-//     std::normal_distribution<float> distribution(0.0, 1.0);
-//     std::vector<std::vector<double> > planes;
-//     for (size_t i = 0; i < _num_splits; ++i) {
-//         std::vector<double> current_vector;
-//         for (size_t j = 0; j < _dimension_size; ++j) {
-//             double current_push = distribution(_generator);
-//             current_vector.push_back(current_push);
-//         }
-//         planes.push_back(current_vector);
-//     }
-//     return planes;
-// }
-
-
     std::vector<std::vector<double> > LSH::create_splits_for_one_table(std::vector<std::vector<double> > points) {
         std::uniform_int_distribution<int64_t> distrib(0, points.size()); 
         std::vector<std::vector<double> > plane(_num_splits);
